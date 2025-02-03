@@ -1,0 +1,303 @@
+/* General Reset */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #e7f7fa;
+    /* Light blue background */
+    color: #333;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    padding: 20px;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+
+/* Container */
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+
+/* Section Styles */
+
+.left-section,
+.right-section {
+    flex: 1;
+    max-width: 45%;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Centered Container for the Form */
+
+.centered-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+
+/* Form Styling */
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 30px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    animation: fadeIn 0.8s ease-out;
+}
+
+
+/* Label Styling */
+
+label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+input,
+select {
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
+    transition: all 0.3s ease;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+
+/* Button Styling */
+
+button {
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    background: linear-gradient(45deg, #6199b1, #ec7480);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(45deg, #1b5280, #f07984);
+}
+
+button:active {
+    transform: scale(1);
+}
+
+
+/* Select Dropdown */
+
+select {
+    cursor: pointer;
+}
+
+select option {
+    padding: 10px;
+}
+
+
+/* Animations */
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+/* Patient List Styling */
+
+.patient-list-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.patient-item {
+    background-color: #fff;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    list-style-type: none;
+    transition: transform 0.3s ease;
+}
+
+.patient-item:hover {
+    transform: scale(1.03);
+}
+
+.patient-details {
+    font-size: 1rem;
+    color: #555;
+}
+
+.remove-button {
+    padding: 8px 12px;
+    background-color: #ff4d4d;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+.remove-button:hover {
+    background-color: #ff1a1a;
+}
+
+
+/* Form Container */
+
+.form-container-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f7fc;
+    padding: 2rem;
+}
+
+
+/* Doctor Entry Form */
+
+.doctor-entry-form {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+.doctor-entry-form h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+    text-align: center;
+}
+
+.doctor-entry-form label {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    display: block;
+    color: #555;
+}
+
+.doctor-entry-form input,
+.doctor-entry-form select {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+}
+
+.doctor-entry-form input:focus,
+.doctor-entry-form select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+
+/* Button Styling */
+
+.submit-btn {
+    background-color: #007bff;
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
+}
+
+.submit-btn:active {
+    background-color: #003d7a;
+}
+
+
+/* Form Message */
+
+.form-message {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 1.1rem;
+    color: #d9534f;
+}
+
+
+/* Responsive Design */
+
+@media (max-width: 600px) {
+    .doctor-entry-form {
+        padding: 1.5rem;
+    }
+}

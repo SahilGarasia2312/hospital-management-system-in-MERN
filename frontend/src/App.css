@@ -1,0 +1,118 @@
+/* General Reset */
+
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(180deg, #f4f4f4, #e0f7fa);
+    /* Subtle, calming gradient */
+    color: #333;
+    /* Ensuring good contrast with text */
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+}
+
+
+/* Box Container */
+
+
+/* Card Container */
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    padding: 20px;
+    overflow-y: auto;
+    height: 100vh;
+    justify-content: center;
+    animation: slideIn 1s ease-out;
+}
+
+
+/* Card Styling with Animation */
+
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    opacity: 0;
+    animation: fadeIn 0.8s forwards;
+    animation-delay: calc(var(--index) * 0.2s);
+}
+
+
+/* Adding Staggered Animation Delay */
+
+.card:nth-child(1) {
+    --index: 1;
+}
+
+.card:nth-child(2) {
+    --index: 2;
+}
+
+.card:nth-child(3) {
+    --index: 3;
+}
+
+.card:nth-child(4) {
+    --index: 4;
+}
+
+.card:nth-child(5) {
+    --index: 5;
+}
+
+
+/* Hover Effect */
+
+.card:hover {
+    transform: translateY(-10px) rotate(-2deg) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Slide-in Animation for Containers */
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* Fade-in Animation for Cards */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+    .box-container,
+    .card-container {
+        flex-direction: column;
+        align-items: center;
+    }
+}

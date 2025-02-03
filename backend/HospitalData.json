@@ -1,0 +1,97 @@
+{
+  "doctors": [
+    {
+      "doctorId": 1,
+      "name": "Dr. Asha Mehta",
+      "specialization": "Cardiologist",
+      "experience": 15,
+      "patients": [
+        {
+          "patientId": 101,
+          "name": "bhushan satote",
+          "disease": "asthma",
+          "admissionStatus": "Indoor"
+        },
+        {
+          "patientId": 102,
+          "name": "bhushan satote",
+          "disease": "asthma",
+          "admissionStatus": "Outdoor"
+        },
+        {
+          "patientId": 103,
+          "name": "mayur patil",
+          "disease": "jondis",
+          "admissionStatus": "Outdoor"
+        },
+        {
+          "patientId": 104,
+          "name": "dhruve trivedi",
+          "disease": "Hydrocephalus ",
+          "admissionStatus": "Outdoor"
+        }
+      ]
+    },
+    {
+      "doctorId": 2,
+      "name": "Dr. Sanjay Roy",
+      "specialization": "Neurologist",
+      "experience": 10,
+      "patients": [
+        {
+          "patientId": 201,
+          "name": "jeel patel",
+          "disease": "asthma",
+          "admissionStatus": "Outdoor"
+        },
+        {
+          "patientId": 202,
+          "name": "diya rathod",
+          "disease": "asthma",
+          "admissionStatus": "Outdoor"
+        },
+        {
+          "patientId": 203,
+          "name": "samir shah",
+          "disease": "Hydrocephalus",
+          "admissionStatus": "Indoor"
+        }
+      ]
+    },
+    {
+      "doctorId": 3,
+      "name": "Dr. amisha patel",
+      "specialization": "Cardiologist",
+      "experience": 10,
+      "patients": [
+        {
+          "patientId": 301,
+          "name": "jaypatel",
+          "disease": "Chickenpox ",
+          "admissionStatus": "Outdoor"
+        }
+      ]
+    },
+    {
+      "doctorId": 5,
+      "name": "avinash shah",
+      "specialization": "Orthopedic",
+      "experience": "3",
+      "patients": []
+    },
+    {
+      "doctorId": 6,
+      "name": "Dr. rohit sharma",
+      "specialization": "Neurologist",
+      "experience": 10,
+      "patients": []
+    },
+    {
+      "doctorId": 6,
+      "name": "ajay shah",
+      "specialization": "Cardiologist",
+      "experience": "3",
+      "patients": []
+    }
+  ]
+}
