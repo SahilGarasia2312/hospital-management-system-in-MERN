@@ -5,7 +5,7 @@ import useFetch from "../../hooks/useFetch";
 import { getDoctorsApi, deleteDoctorApi } from "../../api/doctor.api";
 import Spinner from "../../components/common/Spinner";
 import Badge from "../../components/common/Badge";
-import { Stethoscope, Plus, Edit2, Trash2, Mail, Phone } from "lucide-react";
+import { Stethoscope, Plus, Edit2, Trash2, Mail } from "lucide-react";
 
 const ManageDoctors = () => {
   const { data: doctors, loading, refetch } = useFetch(getDoctorsApi);

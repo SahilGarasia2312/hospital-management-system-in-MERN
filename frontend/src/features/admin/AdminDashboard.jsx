@@ -12,8 +12,6 @@ import {
   Users, 
   Building2, 
   UserCheck, 
-  PlusCircle, 
-  ArrowRight,
   FileSpreadsheet
 } from "lucide-react";
 

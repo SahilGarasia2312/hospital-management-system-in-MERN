@@ -6,7 +6,7 @@ import { getPatientsApi } from "../../api/patient.api";
 import Spinner from "../../components/common/Spinner";
 import Badge from "../../components/common/Badge";
 import useAuth from "../../hooks/useAuth";
-import { ClipboardList, Phone, FileText, CheckCircle, Clock } from "lucide-react";
+import { ClipboardList, Phone, FileText } from "lucide-react";
 
 const DoctorDashboard = () => {
   const { user } = useAuth();

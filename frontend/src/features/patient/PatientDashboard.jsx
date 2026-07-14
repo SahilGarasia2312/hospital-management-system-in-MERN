@@ -11,7 +11,6 @@ import {
   Stethoscope, 
   Pill, 
   Activity, 
-  Calendar, 
   CheckCircle2, 
   ShieldAlert 
 } from "lucide-react";
