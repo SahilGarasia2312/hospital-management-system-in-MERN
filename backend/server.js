@@ -32,7 +32,7 @@ const limiter = rateLimit({
 app.use("/api/", limiter);
 
 // ─── 4. CORS & Body Parsing ──────────────────────────────────────────────────
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "10kb" })); // prevent payload exhaustion attacks
 
 // ─── 5. NoSQL Injection & Query Sanitization ─────────────────────────────────
@@ -46,8 +46,13 @@ app.use("/api/auth",     authRoutes);
 app.use("/api/doctors",  doctorRoutes);
 app.use("/api/patients", patientRoutes);
 
-// Health check
+// Health check & API Root
 app.get("/api/health", (req, res) => res.json({ status: "ok", timestamp: new Date() }));
+app.get("/", (req, res) => res.json({ 
+  message: "🚀 HPMS Enterprise Backend API is Live & Connected to MongoDB Atlas!", 
+  status: "active",
+  endpoints: ["/api/auth", "/api/doctors", "/api/patients", "/api/health"]
+}));
 
 // ─── Global Error Handler (must be last) ─────────────────────────────────────
 app.use(errorHandler);
