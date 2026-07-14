@@ -15,13 +15,17 @@ import { errorHandler } from "./src/middleware/error.middleware.js";
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-// ─── 1. Security & HTTP Header Hardening (`helmet`) ──────────────────────────
-app.use(helmet());
+// ─── 1. CORS & Preflight (MUST BE FIRST before Helmet & Rate Limiter) ─────────
+app.use(cors({ origin: true, credentials: true }));
+app.options("*", cors({ origin: true, credentials: true }));
 
-// ─── 2. HTTP Request Logging & Telemetry (`morgan`) ──────────────────────────
+// ─── 2. Security & HTTP Header Hardening (`helmet`) ──────────────────────────
+app.use(helmet({ crossOriginResourcePolicy: false }));
+
+// ─── 3. HTTP Request Logging & Telemetry (`morgan`) ──────────────────────────
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
-// ─── 3. Rate Limiting (Prevent Brute Force & DDoS) ───────────────────────────
+// ─── 4. Rate Limiting (Prevent Brute Force & DDoS) ───────────────────────────
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes window
   max: 200, // limit each IP to 200 requests per window
@@ -31,8 +35,7 @@ const limiter = rateLimit({
 });
 app.use("/api/", limiter);
 
-// ─── 4. CORS & Body Parsing ──────────────────────────────────────────────────
-app.use(cors({ origin: true, credentials: true }));
+// ─── 5. Body Parsing & NoSQL Injection Sanitization ──────────────────────────
 app.use(express.json({ limit: "10kb" })); // prevent payload exhaustion attacks
 
 // ─── 5. NoSQL Injection & Query Sanitization ─────────────────────────────────
