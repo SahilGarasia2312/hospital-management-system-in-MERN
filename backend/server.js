@@ -7,6 +7,7 @@ import rateLimit from "express-rate-limit";
 import mongoSanitize from "express-mongo-sanitize";
 import morgan from "morgan";
 import { connectDB } from "./src/config/db.js";
+import mongoose from "mongoose";
 import authRoutes from "./src/modules/auth/auth.routes.js";
 import doctorRoutes from "./src/modules/doctor/doctor.routes.js";
 import patientRoutes from "./src/modules/patient/patient.routes.js";
@@ -50,10 +51,15 @@ app.use("/api/doctors",  doctorRoutes);
 app.use("/api/patients", patientRoutes);
 
 // Health check & API Root
-app.get("/api/health", (req, res) => res.json({ status: "ok", timestamp: new Date() }));
-app.get("/", (req, res) => res.json({ 
+app.get("/api/health", (req, res) => res.status(200).json({ 
+  status: "ok", 
+  dbConnected: mongoose.connection.readyState === 1,
+  timestamp: new Date() 
+}));
+app.get("/", (req, res) => res.status(200).json({ 
   message: "🚀 HPMS Enterprise Backend API is Live & Connected to MongoDB Atlas!", 
   status: "active",
+  dbConnected: mongoose.connection.readyState === 1,
   endpoints: ["/api/auth", "/api/doctors", "/api/patients", "/api/health"]
 }));
 

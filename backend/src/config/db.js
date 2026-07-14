@@ -11,6 +11,6 @@ export const connectDB = async () => {
     console.log(`✅ MongoDB connected: ${conn.connection.host}`);
   } catch (err) {
     console.error(`❌ MongoDB connection failed: ${err.message}`);
-    process.exit(1);
+    console.error("⚠️ Server will remain awake so Uptime monitoring stays alive. Please check MONGO_URI in Render dashboard.");
   }
 };
