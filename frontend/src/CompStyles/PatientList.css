@@ -1,0 +1,56 @@
+.container {
+    display: flex;
+}
+
+.left-section {
+    flex: 1;
+    padding-right: 20px;
+}
+
+.right-section {
+    flex: 3;
+    padding-left: 20px;
+}
+
+.patient-list-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.patient-list {
+    list-style: none;
+    padding: 0;
+}
+
+.patient-item {
+    padding: 15px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.patient-details {
+    margin-bottom: 10px;
+}
+
+.patient-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.remove-button,
+.edit-button {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.edit-form input {
+    margin-bottom: 10px;
+    padding: 5px;
+    width: 100%;
+}
+
+.edit-form button {
+    padding: 5px 10px;
+    cursor: pointer;
+}

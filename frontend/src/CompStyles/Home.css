@@ -1,0 +1,252 @@
+/* Global Styles */
+
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f2f2f2;
+    color: #333;
+    transition: background-color 0.3s ease-in-out;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+.active {
+    color: #004d6a;
+    /* Teal Color */
+}
+
+
+/* Container */
+
+.container {
+    background-color: #ffffff;
+    color: #333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 1200px;
+}
+
+
+/* Hero Section - Modern Look with Overlay */
+
+.hero-section {
+    height: 100vh;
+    background-image: url('https://images.nightcafe.studio/jobs/8xrWMdueUN2SIqPvm8dW/8xrWMdueUN2SIqPvm8dW--0--u8kwh.jpg?tr=w-1600,c-at_max');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    /* Dark overlay */
+    border-radius: 15px;
+    z-index: 0;
+}
+
+.hero-content {
+    z-index: 1;
+    color: #fff;
+    text-align: center;
+    padding: 0 20px;
+}
+
+.hero-content h1 {
+    font-size: 4.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 1px;
+    line-height: 1.2;
+}
+
+.hero-content p {
+    font-size: 1.6rem;
+    margin: 20px 0;
+    font-weight: 300;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.styled-button {
+    background-color: #004d6a;
+    /* Teal Color */
+    color: #fff;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    border: none;
+    cursor: pointer;
+    margin-top: 30px;
+    text-decoration: none;
+    border-radius: 50px;
+    display: inline-block;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    text-transform: uppercase;
+}
+
+.styled-button:hover {
+    background-color: #003c4f;
+    /* Darker Teal */
+    transform: translateY(-5px);
+}
+
+
+/* Section */
+
+.section {
+    padding: 80px 20px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    margin-bottom: 40px;
+}
+
+.section-title {
+    font-size: 2.8rem;
+    margin-bottom: 40px;
+    font-weight: 600;
+    color: #004d6a;
+    /* Teal */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+
+/* About Content */
+
+.about-content {
+    font-size: 1.1rem;
+    margin: 0 auto;
+    max-width: 900px;
+    color: #555;
+}
+
+
+/* Services Grid */
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    justify-items: center;
+    margin-top: 40px;
+}
+
+
+/* Service Card */
+
+.service-card {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.service-card i {
+    font-size: 3.5rem;
+    color: #004d6a;
+    /* Teal Color */
+    margin-bottom: 20px;
+}
+
+.service-card h3 {
+    font-size: 1.8rem;
+    margin-top: 20px;
+    color: #333;
+    font-weight: 600;
+}
+
+
+/* Footer */
+
+.footer {
+    background-color: #004d6a;
+    /* Teal */
+    color: #fff;
+    padding: 40px 20px;
+    text-align: center;
+    border-top: 1px solid #fff;
+}
+
+.footer a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 10px;
+    font-size: 1.1rem;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+
+/* Buttons */
+
+button {
+    background-color: #004d6a;
+    /* Teal */
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    margin-top: 20px;
+}
+
+button:hover {
+    background-color: #003c4f;
+    /* Darker Teal */
+    transform: translateY(-3px);
+}
+
+button:focus {
+    outline: none;
+}
+
+
+/* Mobile View Adjustments */
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: center;
+        padding: 15px;
+    }
+    .navbar .nav-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        margin-top: 10px;
+    }
+    .navbar .nav-links a {
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+    }
+}
