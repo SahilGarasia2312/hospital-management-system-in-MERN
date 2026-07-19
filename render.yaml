@@ -1,19 +1,33 @@
 services:
+  # ─── Backend API ─────────────────────────────────────────────────────────────
   - type: web
     name: hpms-backend
     env: node
     rootDir: backend
     buildCommand: npm install
     startCommand: node server.js
-    healthCheckPath: /api/health          # fix: Render pings this — must return 200 for service to go "live"
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 10000                       # fix: Render dynamically assigns PORT=10000 internally — must match
+        value: 8000
       - key: MONGO_URI
-        sync: false                        # Set manually in Render Dashboard → Environment tab
+        sync: false   # set this manually in Render dashboard — never commit secrets
       - key: JWT_SECRET
-        sync: false                        # Set manually in Render Dashboard → Environment tab
+        sync: false
       - key: JWT_EXPIRES_IN
         value: 7d
+
+  # ─── Frontend Static Site ─────────────────────────────────────────────────────
+  - type: web
+    name: hpms-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && REACT_APP_API_URL=https://hospital-management-system-in-mern-2.onrender.com/api npm run build
+    staticPublishPath: build
+    # fix: React env vars are baked at build time — must pass the live backend URL
+    # here, NOT in .env, so the production bundle calls the correct API endpoint.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html  # fix: enables React Router client-side navigation
