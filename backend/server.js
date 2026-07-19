@@ -42,9 +42,6 @@ app.use(express.json({ limit: "10kb" })); // prevent payload exhaustion attacks
 // ─── 5. NoSQL Injection & Query Sanitization ─────────────────────────────────
 app.use(mongoSanitize()); // strips out $ and . operators from req.body/query/params
 
-// ─── Database Connection ──────────────────────────────────────────────────────
-connectDB();
-
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use("/api/auth",     authRoutes);
 app.use("/api/doctors",  doctorRoutes);
@@ -66,4 +63,19 @@ app.get("/", (req, res) => res.status(200).json({
 // ─── Global Error Handler (must be last) ─────────────────────────────────────
 app.use(errorHandler);
 
-app.listen(PORT, () => console.log(`🚀 HPMS Server running on http://localhost:${PORT}`));
+// ─── fix: Start server ONLY after DB connects so Render health-check doesn't
+//     pass prematurely and serve 503s on every route. ─────────────────────────
+const startServer = async () => {
+  try {
+    await connectDB(); // wait for MongoDB before opening the HTTP port
+    app.listen(PORT, () =>
+      console.log(`🚀 HPMS Server running on http://localhost:${PORT}`)
+    );
+  } catch (err) {
+    // connectDB already logs the error and exits, but guard here too
+    console.error("❌ Fatal startup error:", err.message);
+    process.exit(1);
+  }
+};
+
+startServer();

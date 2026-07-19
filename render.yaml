@@ -5,14 +5,15 @@ services:
     rootDir: backend
     buildCommand: npm install
     startCommand: node server.js
+    healthCheckPath: /api/health          # fix: Render pings this — must return 200 for service to go "live"
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 8000
+        value: 10000                       # fix: Render dynamically assigns PORT=10000 internally — must match
       - key: MONGO_URI
-        sync: false   # set this manually in Render dashboard — never commit secrets
+        sync: false                        # Set manually in Render Dashboard → Environment tab
       - key: JWT_SECRET
-        sync: false
+        sync: false                        # Set manually in Render Dashboard → Environment tab
       - key: JWT_EXPIRES_IN
         value: 7d
