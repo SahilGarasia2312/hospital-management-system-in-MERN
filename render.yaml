@@ -5,12 +5,11 @@ services:
     env: node
     rootDir: backend
     buildCommand: npm install
-    startCommand: node server.js
+    startCommand: npm start
+    # fix: Do NOT hardcode PORT — Render injects it dynamically; hardcoding causes 503
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 8000
       - key: MONGO_URI
         sync: false   # set this manually in Render dashboard — never commit secrets
       - key: JWT_SECRET
