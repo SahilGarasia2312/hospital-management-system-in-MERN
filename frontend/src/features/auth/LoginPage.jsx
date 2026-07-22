@@ -52,15 +52,23 @@ const LoginPage = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    // improvement: Added client-side logging for login debugging
+    console.log("[AUTH DEBUG] Submitting login payload:", { email: form.email });
+
     try {
       const res = await loginApi(form);
+      console.log("[AUTH DEBUG] Login API response:", res);
       const { token, user } = res.data;
       
+      console.log("[AUTH DEBUG] User authenticated successfully:", user);
       // Store session and redirect based on backend-authenticated RBAC role
       login(token, user);
       const targetRoute = DASHBOARD_ROUTES[user.role] || "/";
+      console.log("[AUTH DEBUG] Navigating to target route:", targetRoute);
       navigate(targetRoute, { replace: true });
     } catch (err) {
+      console.error("[AUTH DEBUG] Login error caught:", err.response?.data || err.message);
       setError(err.response?.data?.message || "Authentication failed. Please verify your credentials.");
     } finally {
       setLoading(false);

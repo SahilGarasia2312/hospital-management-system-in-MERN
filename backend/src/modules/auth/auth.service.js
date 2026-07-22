@@ -41,10 +41,21 @@ export const registerUser = async (userData) => {
  * @returns {object} Signed JWT + user info
  */
 export const loginUser = async (email, password) => {
+  // improvement: Added detailed logging for debugging login flow
+  console.log(`[AUTH DEBUG] Attempting login for email: ${email}`);
+
   // Must select password explicitly (it's select: false in schema)
   const user = await User.findOne({ email }).select("+password");
 
-  if (!user || !user.isActive) {
+  if (!user) {
+    console.warn(`[AUTH DEBUG] Login failed: User not found with email '${email}'`);
+    const error = new Error("Invalid email or password.");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  if (!user.isActive) {
+    console.warn(`[AUTH DEBUG] Login failed: Account for '${email}' is deactivated`);
     const error = new Error("Invalid email or password.");
     error.statusCode = 401;
     throw error;
@@ -53,11 +64,13 @@ export const loginUser = async (email, password) => {
   // Use the instance method defined on the User model
   const isMatch = await user.comparePassword(password);
   if (!isMatch) {
+    console.warn(`[AUTH DEBUG] Login failed: Password mismatch for user '${email}'`);
     const error = new Error("Invalid email or password.");
     error.statusCode = 401;
     throw error;
   }
 
+  console.log(`[AUTH DEBUG] Login successful for user: ${user.email} (Role: ${user.role})`);
   const token = signToken({ id: user._id, role: user.role, name: user.name, email: user.email });
 
   return {
