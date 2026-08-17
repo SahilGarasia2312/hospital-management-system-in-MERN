@@ -1,6 +1,7 @@
 // modules/patient/patient.service.js — Pure business logic for patient operations
 import Patient from "./patient.model.js";
 import Doctor from "../doctor/doctor.model.js";
+import { NotFoundError } from "../../core/errors/index.js";
 
 /**
  * Generates the next sequential patientId safely using aggregation.
@@ -36,9 +37,7 @@ export const getPatientById = async (patientId) => {
     "name specialization experience"
   );
   if (!patient) {
-    const err = new Error("Patient not found.");
-    err.statusCode = 404;
-    throw err;
+    throw new NotFoundError("Patient not found.");
   }
   return patient;
 };
@@ -49,9 +48,7 @@ export const createPatient = async (data) => {
 
   const doctor = await Doctor.findOne({ doctorId: Number(numericDoctorId) });
   if (!doctor) {
-    const err = new Error("Doctor not found.");
-    err.statusCode = 404;
-    throw err;
+    throw new NotFoundError("Doctor not found.");
   }
 
   const patientId = await generatePatientId();
@@ -66,9 +63,7 @@ export const updatePatient = async (patientId, data) => {
     { new: true, runValidators: true }
   );
   if (!patient) {
-    const err = new Error("Patient not found.");
-    err.statusCode = 404;
-    throw err;
+    throw new NotFoundError("Patient not found.");
   }
   return patient;
 };
@@ -77,9 +72,7 @@ export const updatePatient = async (patientId, data) => {
 export const deletePatient = async (patientId) => {
   const patient = await Patient.findOneAndDelete({ patientId: Number(patientId) });
   if (!patient) {
-    const err = new Error("Patient not found.");
-    err.statusCode = 404;
-    throw err;
+    throw new NotFoundError("Patient not found.");
   }
   return patient;
 };

@@ -2,6 +2,7 @@
 // No Express here — services are framework-agnostic and fully testable
 import Doctor from "./doctor.model.js";
 import Patient from "../patient/patient.model.js";
+import { NotFoundError } from "../../core/errors/index.js";
 
 /**
  * Generates the next sequential doctorId safely.
@@ -21,9 +22,7 @@ export const getAllDoctors = async () => {
 export const getDoctorById = async (doctorId) => {
   const doctor = await Doctor.findOne({ doctorId: Number(doctorId) });
   if (!doctor) {
-    const err = new Error("Doctor not found.");
-    err.statusCode = 404;
-    throw err;
+    throw new NotFoundError("Doctor not found.");
   }
   return doctor;
 };
@@ -43,9 +42,7 @@ export const updateDoctor = async (doctorId, data) => {
     { new: true, runValidators: true }
   );
   if (!doctor) {
-    const err = new Error("Doctor not found.");
-    err.statusCode = 404;
-    throw err;
+    throw new NotFoundError("Doctor not found.");
   }
   return doctor;
 };
@@ -54,9 +51,7 @@ export const updateDoctor = async (doctorId, data) => {
 export const deleteDoctor = async (doctorId) => {
   const doctor = await Doctor.findOneAndDelete({ doctorId: Number(doctorId) });
   if (!doctor) {
-    const err = new Error("Doctor not found.");
-    err.statusCode = 404;
-    throw err;
+    throw new NotFoundError("Doctor not found.");
   }
   // Cascade delete all patients belonging to this doctor
   await Patient.deleteMany({ doctorId: doctor._id });

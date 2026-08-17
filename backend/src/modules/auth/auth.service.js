@@ -2,6 +2,7 @@
 // No Express req/res here — services are framework-agnostic and unit-testable
 import User from "../../models/user.model.js";
 import { signToken } from "../../utils/jwt.utils.js";
+import { ConflictError, UnauthorizedError, NotFoundError } from "../../core/errors/index.js";
 
 /**
  * Registers a new user (admin-only action).
@@ -16,9 +17,7 @@ export const registerUser = async (userData) => {
   // Check if user with this email already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    const error = new Error("A user with this email already exists.");
-    error.statusCode = 409;
-    throw error;
+    throw new ConflictError("A user with this email already exists.");
   }
 
   // Create user — password hashing is done in the pre-save hook
@@ -49,25 +48,19 @@ export const loginUser = async (email, password) => {
 
   if (!user) {
     console.warn(`[AUTH DEBUG] Login failed: User not found with email '${email}'`);
-    const error = new Error("Invalid email or password.");
-    error.statusCode = 401;
-    throw error;
+    throw new UnauthorizedError("Invalid email or password.");
   }
 
   if (!user.isActive) {
     console.warn(`[AUTH DEBUG] Login failed: Account for '${email}' is deactivated`);
-    const error = new Error("Invalid email or password.");
-    error.statusCode = 401;
-    throw error;
+    throw new UnauthorizedError("Invalid email or password.");
   }
 
   // Use the instance method defined on the User model
   const isMatch = await user.comparePassword(password);
   if (!isMatch) {
     console.warn(`[AUTH DEBUG] Login failed: Password mismatch for user '${email}'`);
-    const error = new Error("Invalid email or password.");
-    error.statusCode = 401;
-    throw error;
+    throw new UnauthorizedError("Invalid email or password.");
   }
 
   console.log(`[AUTH DEBUG] Login successful for user: ${user.email} (Role: ${user.role})`);
@@ -92,9 +85,7 @@ export const loginUser = async (email, password) => {
 export const getMe = async (userId) => {
   const user = await User.findById(userId).select("-password");
   if (!user) {
-    const error = new Error("User not found.");
-    error.statusCode = 404;
-    throw error;
+    throw new NotFoundError("User not found.");
   }
   return user;
 };
