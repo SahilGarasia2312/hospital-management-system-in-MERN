@@ -1,7 +1,8 @@
 // modules/auth/auth.controller.js — Handles HTTP req/res, delegates to auth.service
 // Controllers are thin: validate input → call service → send response
 import { registerUser, loginUser, getMe } from "./auth.service.js";
-import { sendSuccess, sendError } from "../../utils/response.utils.js";
+import { sendSuccess } from "../../utils/response.utils.js";
+import { BadRequestError } from "../../core/errors/index.js";
 
 /**
  * POST /api/auth/register
@@ -25,7 +26,7 @@ export const login = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return sendError(res, "Email and password are required.", 400);
+      return next(new BadRequestError("Email and password are required."));
     }
 
     const result = await loginUser(email, password);

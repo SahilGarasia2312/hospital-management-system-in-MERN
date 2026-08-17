@@ -18,18 +18,15 @@ describe("QA Security Test: auth.middleware", () => {
 
   test("should return 401 if Authorization header is missing", () => {
     verifyTokenMiddleware(req, res, next);
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ message: expect.stringMatching(/access denied/i) })
-    );
-    expect(next).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 401, message: expect.stringMatching(/access denied/i) }));
+    expect(res.status).not.toHaveBeenCalled();
   });
 
   test("should return 401 if Authorization format is invalid (not Bearer)", () => {
     req.headers.authorization = "Basic 12345";
     verifyTokenMiddleware(req, res, next);
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(next).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 401 }));
+    expect(res.status).not.toHaveBeenCalled();
   });
 
   test("should attach decoded user to req.user and call next() on valid token", () => {
@@ -53,10 +50,7 @@ describe("QA Security Test: auth.middleware", () => {
 
     verifyTokenMiddleware(req, res, next);
 
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ message: expect.stringMatching(/expired/i) })
-    );
-    expect(next).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 401, message: expect.stringMatching(/expired/i) }));
+    expect(res.status).not.toHaveBeenCalled();
   });
 });

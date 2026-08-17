@@ -1,6 +1,6 @@
 // modules/doctor/doctor.controller.js — HTTP layer for doctor endpoints
 import * as doctorService from "./doctor.service.js";
-import { sendSuccess, sendError } from "../../utils/response.utils.js";
+import { sendSuccess } from "../../utils/response.utils.js";
 
 export const getAllDoctors = async (req, res, next) => {
   try {

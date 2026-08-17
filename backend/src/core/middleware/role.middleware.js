@@ -1,6 +1,6 @@
 // middleware/role.middleware.js — Role-Based Access Control (RBAC) middleware
 // feature: Factory function that returns middleware to guard routes by user role
-import { sendError } from "../../utils/response.utils.js";
+import { UnauthorizedError, ForbiddenError } from "../errors/index.js";
 
 /**
  * Middleware factory: requireRole
@@ -18,14 +18,12 @@ export const requireRole = (...roles) => {
   return (req, res, next) => {
     // req.user is set by verifyTokenMiddleware
     if (!req.user) {
-      return sendError(res, "Authentication required.", 401);
+      return next(new UnauthorizedError("Authentication required."));
     }
 
     if (!roles.includes(req.user.role)) {
-      return sendError(
-        res,
-        `Access denied. Required role: [${roles.join(", ")}]. Your role: ${req.user.role}`,
-        403
+      return next(
+        new ForbiddenError(`Access denied. Required role: [${roles.join(", ")}]. Your role: ${req.user.role}`)
       );
     }
 

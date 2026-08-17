@@ -1,7 +1,7 @@
 // middleware/auth.middleware.js — JWT verification middleware
 // feature: Decodes the Bearer token and attaches req.user for downstream use
 import { verifyToken } from "../../utils/jwt.utils.js";
-import { sendError } from "../../utils/response.utils.js";
+import { UnauthorizedError } from "../errors/index.js";
 
 /**
  * Middleware: verifyToken
@@ -16,7 +16,7 @@ export const verifyTokenMiddleware = (req, res, next) => {
     // Extract token from "Authorization: Bearer <token>" header
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return sendError(res, "Access denied. No token provided.", 401);
+      return next(new UnauthorizedError("Access denied. No token provided."));
     }
 
     const token = authHeader.split(" ")[1];
@@ -27,8 +27,8 @@ export const verifyTokenMiddleware = (req, res, next) => {
     next();
   } catch (err) {
     if (err.name === "TokenExpiredError") {
-      return sendError(res, "Token has expired. Please log in again.", 401);
+      return next(new UnauthorizedError("Token has expired. Please log in again."));
     }
-    return sendError(res, "Invalid token.", 401);
+    return next(new UnauthorizedError("Invalid token."));
   }
 };

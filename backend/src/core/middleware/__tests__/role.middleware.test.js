@@ -19,11 +19,8 @@ describe("QA Security Test: role.middleware (RBAC)", () => {
     const middleware = requireRole("admin");
     middleware(req, res, next);
 
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ message: expect.stringMatching(/authentication required/i) })
-    );
-    expect(next).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 401, message: expect.stringMatching(/authentication required/i) }));
+    expect(res.status).not.toHaveBeenCalled();
   });
 
   test("should return 403 Forbidden if user role is not allowed", () => {
@@ -31,11 +28,8 @@ describe("QA Security Test: role.middleware (RBAC)", () => {
     const middleware = requireRole("admin", "doctor");
     middleware(req, res, next);
 
-    expect(res.status).toHaveBeenCalledWith(403);
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ message: expect.stringMatching(/access denied/i) })
-    );
-    expect(next).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 403, message: expect.stringMatching(/access denied/i) }));
+    expect(res.status).not.toHaveBeenCalled();
   });
 
   test("should call next() if user role is included in allowed roles", () => {
