@@ -1,7 +1,7 @@
 // middleware/auth.middleware.js — JWT verification middleware
 // feature: Decodes the Bearer token and attaches req.user for downstream use
-import { verifyToken } from "../utils/jwt.utils.js";
-import { sendError } from "../utils/response.utils.js";
+import { verifyToken } from "../../utils/jwt.utils.js";
+import { sendError } from "../../utils/response.utils.js";
 
 /**
  * Middleware: verifyToken

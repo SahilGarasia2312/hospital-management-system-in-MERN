@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 import authRoutes from "./modules/auth/auth.routes.js";
 import doctorRoutes from "./modules/doctor/doctor.routes.js";
 import patientRoutes from "./modules/patient/patient.routes.js";
-import { errorHandler } from "./middleware/error.middleware.js";
+import { errorHandler } from "./core/middleware/error.middleware.js";
 
 const app = express();
 

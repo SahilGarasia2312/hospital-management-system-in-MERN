@@ -1,6 +1,6 @@
 // middleware/role.middleware.js — Role-Based Access Control (RBAC) middleware
 // feature: Factory function that returns middleware to guard routes by user role
-import { sendError } from "../utils/response.utils.js";
+import { sendError } from "../../utils/response.utils.js";
 
 /**
  * Middleware factory: requireRole
