@@ -34,7 +34,11 @@ export const errorHandler = (err, req, res, next) => {
 
   // Application operational errors
   if (err instanceof AppError) {
-    return res.status(err.statusCode).json({ success: false, message: err.message });
+    const payload = { success: false, message: err.message };
+    if (err.errors) {
+      payload.errors = err.errors;
+    }
+    return res.status(err.statusCode).json(payload);
   }
 
   // Default: Internal server error (hide sensitive details)
