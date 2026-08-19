@@ -5,9 +5,7 @@ import rateLimit from "express-rate-limit";
 import mongoSanitize from "express-mongo-sanitize";
 import morgan from "morgan";
 import mongoose from "mongoose";
-import authRoutes from "./modules/auth/auth.routes.js";
-import doctorRoutes from "./modules/doctor/doctor.routes.js";
-import patientRoutes from "./modules/patient/patient.routes.js";
+import apiRoutes from "./routes/index.js";
 import { errorHandler } from "./core/middleware/error.middleware.js";
 
 const app = express();
@@ -39,21 +37,19 @@ app.use(express.json({ limit: "10kb" })); // prevent payload exhaustion attacks
 app.use(mongoSanitize()); // strips out $ and . operators from req.body/query/params
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
-app.use("/api/auth",     authRoutes);
-app.use("/api/doctors",  doctorRoutes);
-app.use("/api/patients", patientRoutes);
+app.use("/api", apiRoutes);
 
 // Health check & API Root
-app.get("/api/health", (req, res) => res.status(200).json({ 
-  status: "ok", 
+app.get("/api/health", (req, res) => res.status(200).json({
+  status: "ok",
   dbConnected: mongoose.connection.readyState === 1,
-  timestamp: new Date() 
+  timestamp: new Date()
 }));
-app.get("/", (req, res) => res.status(200).json({ 
-  message: "🚀 HPMS Enterprise Backend API is Live & Connected to MongoDB Atlas!", 
+app.get("/", (req, res) => res.status(200).json({
+  message: "🚀 HPMS Enterprise Backend API is Live & Connected to MongoDB Atlas!",
   status: "active",
   dbConnected: mongoose.connection.readyState === 1,
-  endpoints: ["/api/auth", "/api/doctors", "/api/patients", "/api/health"]
+  endpoints: ["/api/v1/auth", "/api/v1/doctors", "/api/v1/patients", "/api/health"]
 }));
 
 // ─── Global Error Handler (must be last) ─────────────────────────────────────
