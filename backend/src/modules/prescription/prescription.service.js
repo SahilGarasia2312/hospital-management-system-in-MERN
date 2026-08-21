@@ -215,33 +215,44 @@ export const dispensePrescription = async (prescriptionId, dispensePayload = {},
   }
 
   const itemsToDispense = dispensePayload.dispenseItems || [];
+  const stockDeductions = [];
 
-  // Default: dispense full remaining quantity for each item if specific array not provided
-  for (const item of prescription.items) {
-    const matchedReq = itemsToDispense.find((d) => String(d.medicineId) === String(item.medicineId));
-    const qtyToDispense = matchedReq
-      ? Number(matchedReq.quantityToDispense)
-      : item.quantityPrescribed - item.quantityDispensed;
+  try {
+    for (const item of prescription.items) {
+      const matchedReq = itemsToDispense.find((d) => String(d.medicineId) === String(item.medicineId));
+      const qtyToDispense = matchedReq
+        ? Number(matchedReq.quantityToDispense)
+        : item.quantityPrescribed - item.quantityDispensed;
 
-    if (qtyToDispense <= 0) continue;
+      if (qtyToDispense <= 0) continue;
 
-    const remainingToPrescribe = item.quantityPrescribed - item.quantityDispensed;
-    if (qtyToDispense > remainingToPrescribe) {
-      throw new BadRequestError(`Cannot dispense ${qtyToDispense} units for '${item.medicineName}'. Exceeds remaining prescribed quantity (${remainingToPrescribe}).`);
+      const remainingToPrescribe = item.quantityPrescribed - item.quantityDispensed;
+      if (qtyToDispense > remainingToPrescribe) {
+        throw new BadRequestError(`Cannot dispense ${qtyToDispense} units for '${item.medicineName}'. Exceeds remaining prescribed quantity (${remainingToPrescribe}).`);
+      }
+
+      // Atomic inventory reduction check
+      const updatedMedicine = await Medicine.findOneAndUpdate(
+        { _id: item.medicineId, stockQuantity: { $gte: qtyToDispense } },
+        { $inc: { stockQuantity: -qtyToDispense } },
+        { new: true }
+      );
+
+      if (!updatedMedicine) {
+        throw new BadRequestError(`Insufficient stock in inventory for medicine '${item.medicineName}'. Dispensing aborted.`);
+      }
+
+      stockDeductions.push({ medicineId: item.medicineId, quantity: qtyToDispense });
+      item.quantityDispensed += qtyToDispense;
     }
-
-    // Atomic inventory reduction check
-    const updatedMedicine = await Medicine.findOneAndUpdate(
-      { _id: item.medicineId, stockQuantity: { $gte: qtyToDispense } },
-      { $inc: { stockQuantity: -qtyToDispense } },
-      { new: true }
-    );
-
-    if (!updatedMedicine) {
-      throw new BadRequestError(`Insufficient stock in inventory for medicine '${item.medicineName}'. Dispensing aborted.`);
+  } catch (err) {
+    for (const deduction of stockDeductions) {
+      await Medicine.updateOne(
+        { _id: deduction.medicineId },
+        { $inc: { stockQuantity: deduction.quantity } }
+      );
     }
-
-    item.quantityDispensed += qtyToDispense;
+    throw err;
   }
 
   // Update status based on fulfillment progress

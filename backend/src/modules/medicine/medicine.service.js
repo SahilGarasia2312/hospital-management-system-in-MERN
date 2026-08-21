@@ -1,6 +1,6 @@
 // modules/medicine/medicine.service.js — Pure business logic for medicine catalog management
 import Medicine from "./medicine.model.js";
-import { NotFoundError, ConflictError } from "../../core/errors/index.js";
+import { NotFoundError, ConflictError, BadRequestError } from "../../core/errors/index.js";
 
 /**
  * Generates sequential numeric medicineId safely.
@@ -18,8 +18,9 @@ const generateMedicineId = async () => {
 export const createMedicine = async (data) => {
   const { name, genericName, dosageForm, strength, manufacturer, unitPrice, stockQuantity, reorderLevel } = data;
 
+  const escapedName = name.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const existing = await Medicine.findOne({
-    name: { $regex: new RegExp(`^${name.trim()}$`, "i") },
+    name: { $regex: new RegExp(`^${escapedName}$`, "i") },
     strength: strength.trim(),
     dosageForm,
   });
@@ -126,6 +127,10 @@ export const updateMedicineStock = async (medicineId, stockQuantity) => {
   const medicine = await Medicine.findOne({ medicineId: Number(medicineId) });
   if (!medicine) {
     throw new NotFoundError("Medicine not found in catalog.");
+  }
+
+  if (stockQuantity < 0) {
+    throw new BadRequestError("Stock quantity cannot be negative.");
   }
 
   medicine.stockQuantity = stockQuantity;
