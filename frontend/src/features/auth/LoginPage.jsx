@@ -72,21 +72,30 @@ const LoginPage = () => {
 
   // 3D Carousel / Cube Orbital Motion State
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [isFlipping, setIsFlipping]               = useState(false);
 
-  // Auto-rotate 3D Showcase every 4.5 seconds
+  // Auto-rotate 3D Showcase every 5 seconds with 3D Flip transition
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlideIndex((prev) => (prev + 1) % SHOWCASE_SLIDES.length);
-    }, 4500);
+      triggerSlideChange((prev) => (prev + 1) % SHOWCASE_SLIDES.length);
+    }, 5000);
     return () => clearInterval(timer);
   }, []);
 
+  const triggerSlideChange = (nextIdxOrFn) => {
+    setIsFlipping(true);
+    setTimeout(() => {
+      setCurrentSlideIndex(nextIdxOrFn);
+      setIsFlipping(false);
+    }, 300);
+  };
+
   const handleNextSlide = () => {
-    setCurrentSlideIndex((prev) => (prev + 1) % SHOWCASE_SLIDES.length);
+    triggerSlideChange((prev) => (prev + 1) % SHOWCASE_SLIDES.length);
   };
 
   const handlePrevSlide = () => {
-    setCurrentSlideIndex((prev) => (prev - 1 + SHOWCASE_SLIDES.length) % SHOWCASE_SLIDES.length);
+    triggerSlideChange((prev) => (prev - 1 + SHOWCASE_SLIDES.length) % SHOWCASE_SLIDES.length);
   };
 
   const handleChange = (e) => {
@@ -138,100 +147,102 @@ const LoginPage = () => {
     <div className="login-page">
       {/* ─── Left Branding Panel (3D Cube & Orbital AI Showcase) ─── */}
       <div className="login-left">
-        <div className="login-brand">
-          <div className="login-brand-header">
-            <div className="login-brand-icon-wrapper">
-              <Building2 size={32} />
-            </div>
-            <div>
-              <h1>HPMS Healthcare</h1>
-              <div className="scale-pill">
-                <Sparkles size={13} />
-                <span>Engineered for Small Clinics to Enterprise Hospitals</span>
+        <div className="login-left-content">
+          <div className="login-brand">
+            <div className="login-brand-header">
+              <div className="login-brand-icon-wrapper">
+                <Building2 size={30} />
               </div>
-            </div>
-          </div>
-          <p className="brand-subtext">
-            A unified, scalable hospital & clinic management engine designed for solo practitioners, community health centers, and multi-specialty medical networks.
-          </p>
-        </div>
-
-        {/* ─── 3D Circular Orbital Showcase Cube Container ─── */}
-        <div className="showcase-3d-wrapper">
-          <div className="showcase-3d-stage">
-            <div className="showcase-card active-3d-card">
-              <div className="card-image-container">
-                <img 
-                  src={activeSlide.image} 
-                  alt={activeSlide.title} 
-                  className="showcase-ai-image" 
-                />
-                <div className="image-overlay-gradient"></div>
-                <div className="card-floating-badge">
-                  <span>{activeSlide.badge}</span>
+              <div>
+                <h1>HPMS Healthcare</h1>
+                <div className="scale-pill">
+                  <Sparkles size={13} />
+                  <span>Small Clinics to Enterprise Hospitals</span>
                 </div>
               </div>
-              <div className="card-content">
-                <h3>{activeSlide.title}</h3>
-                <p className="card-tagline">{activeSlide.tagline}</p>
-                <p className="card-desc">{activeSlide.description}</p>
+            </div>
+            <p className="brand-subtext">
+              A unified, intelligent healthcare system designed for solo doctors, community clinics, and multi-specialty hospital networks.
+            </p>
+          </div>
+
+          {/* ─── 3D Circular Orbital Showcase Cube Container ─── */}
+          <div className="showcase-3d-wrapper">
+            <div className="showcase-3d-stage">
+              <div className={`showcase-card ${isFlipping ? "flipping-3d" : ""}`}>
+                <div className="card-image-container">
+                  <img 
+                    src={activeSlide.image} 
+                    alt={activeSlide.title} 
+                    className="showcase-ai-image" 
+                  />
+                  <div className="image-overlay-gradient"></div>
+                  <div className="card-floating-badge">
+                    <span>{activeSlide.badge}</span>
+                  </div>
+                </div>
+                <div className="card-content">
+                  <h3>{activeSlide.title}</h3>
+                  <p className="card-tagline">{activeSlide.tagline}</p>
+                  <p className="card-desc">{activeSlide.description}</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* ─── Orbital Controls & Navigation Dots ───────── */}
-          <div className="showcase-controls">
-            <button 
-              type="button" 
-              className="orbital-nav-btn" 
-              onClick={handlePrevSlide}
-              aria-label="Previous Slide"
-            >
-              <ChevronLeft size={18} />
-            </button>
+            {/* ─── Orbital Controls & Navigation Dots ───────── */}
+            <div className="showcase-controls">
+              <button 
+                type="button" 
+                className="orbital-nav-btn" 
+                onClick={handlePrevSlide}
+                aria-label="Previous Slide"
+              >
+                <ChevronLeft size={18} />
+              </button>
 
-            <div className="orbital-dots">
-              {SHOWCASE_SLIDES.map((slide, idx) => (
-                <button
-                  key={slide.id}
-                  type="button"
-                  className={`orbital-dot ${idx === currentSlideIndex ? "active" : ""}`}
-                  onClick={() => setCurrentSlideIndex(idx)}
-                  title={slide.title}
-                />
-              ))}
-            </div>
+              <div className="orbital-dots">
+                {SHOWCASE_SLIDES.map((slide, idx) => (
+                  <button
+                    key={slide.id}
+                    type="button"
+                    className={`orbital-dot ${idx === currentSlideIndex ? "active" : ""}`}
+                    onClick={() => triggerSlideChange(idx)}
+                    title={slide.title}
+                  />
+                ))}
+              </div>
 
-            <button 
-              type="button" 
-              className="orbital-nav-btn" 
-              onClick={handleNextSlide}
-              aria-label="Next Slide"
-            >
-              <ChevronRight size={18} />
-            </button>
-          </div>
-        </div>
-
-        {/* ─── Bottom Feature Badges ───────────────────────── */}
-        <div className="login-features">
-          <div className="login-feature-item">
-            <div className="login-feature-icon">
-              <Stethoscope size={18} />
-            </div>
-            <div className="login-feature-text">
-              <h4>Solo Clinic & Outpatient Ready</h4>
-              <p>Simple consultation logs, prescription printing, and patient vitals tracking.</p>
+              <button 
+                type="button" 
+                className="orbital-nav-btn" 
+                onClick={handleNextSlide}
+                aria-label="Next Slide"
+              >
+                <ChevronRight size={18} />
+              </button>
             </div>
           </div>
 
-          <div className="login-feature-item">
-            <div className="login-feature-icon">
-              <ShieldCheck size={18} />
+          {/* ─── Bottom Feature Badges ───────────────────────── */}
+          <div className="login-features">
+            <div className="login-feature-item">
+              <div className="login-feature-icon">
+                <Stethoscope size={18} />
+              </div>
+              <div className="login-feature-text">
+                <h4>Solo Clinic & Outpatient Ready</h4>
+                <p>Simple consultation logs, paperless prescriptions, and patient vitals tracking.</p>
+              </div>
             </div>
-            <div className="login-feature-text">
-              <h4>Enterprise Security & Anti-Bot Defense</h4>
-              <p>JWT role-based authorization, request throttling, and automated honeypot bot shielding.</p>
+
+            <div className="login-feature-item">
+              <div className="login-feature-icon">
+                <ShieldCheck size={18} />
+              </div>
+              <div className="login-feature-text">
+                <h4>Enterprise Security & Anti-Bot Protection</h4>
+                <p>JWT role-based authorization, rate limiting, and honeypot bot defense.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -309,19 +320,7 @@ const LoginPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  style={{
-                    position: "absolute",
-                    right: "12px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "#64748b",
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "4px"
-                  }}
+                  className="password-toggle-btn"
                   title={showPassword ? "Hide Password" : "Show Password"}
                   aria-label={showPassword ? "Hide Password" : "Show Password"}
                 >
@@ -332,19 +331,7 @@ const LoginPage = () => {
 
             {/* ─── Bot Protection Verification Box ───────── */}
             <div 
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                padding: "12px",
-                marginBottom: "20px",
-                background: isHumanVerified ? "#f0fdf4" : "#f8fafc",
-                border: isHumanVerified ? "1px solid #bbf7d0" : "1px solid #e2e8f0",
-                borderRadius: "8px",
-                cursor: "pointer",
-                userSelect: "none",
-                transition: "all 0.2s ease"
-              }}
+              className={`bot-verification-box ${isHumanVerified ? "verified" : ""}`}
               onClick={() => setIsHumanVerified(!isHumanVerified)}
             >
               <input
@@ -352,19 +339,11 @@ const LoginPage = () => {
                 type="checkbox"
                 checked={isHumanVerified}
                 onChange={(e) => setIsHumanVerified(e.target.checked)}
-                style={{ width: "18px", height: "18px", cursor: "pointer", accentColor: "#0284c7" }}
+                className="bot-checkbox"
               />
               <label 
                 htmlFor="bot-protection-checkbox"
-                style={{ 
-                  fontSize: "0.875rem", 
-                  color: isHumanVerified ? "#15803d" : "#475569", 
-                  cursor: "pointer",
-                  fontWeight: 500,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px"
-                }}
+                className="bot-label"
               >
                 <Bot size={16} />
                 <span>I am not a bot (Security Check)</span>
