@@ -1,19 +1,18 @@
-/* features/auth/LoginPage.css — Enterprise Clinical Design System Login */
+/* features/auth/LoginPage.css — Enterprise Clinical 3D Showcase & Bot Protection System */
 .login-page {
   min-height: 100vh;
   display: flex;
   background: var(--color-bg);
 }
 
-/* ─── Left panel (Branding & Value Prop) ───────────── */
+/* ─── Left Panel (Branding & 3D Showcase) ─────────────────────────── */
 .login-left {
-  flex: 1;
-  background: linear-gradient(145deg, #0f172a 0%, #1e293b 60%, #0d9488 100%);
+  flex: 1.2;
+  background: linear-gradient(145deg, #0b1329 0%, #111e38 50%, #0d9488 100%);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 64px;
+  justify-content: space-between;
+  padding: 48px 56px;
   position: relative;
   overflow: hidden;
   color: #ffffff;
@@ -22,63 +21,244 @@
 .login-left::before {
   content: "";
   position: absolute;
-  width: 600px; height: 600px;
-  background: radial-gradient(circle, rgba(13, 148, 136, 0.15) 0%, rgba(0,0,0,0) 70%);
-  top: -100px; right: -100px;
+  width: 700px; 
+  height: 700px;
+  background: radial-gradient(circle, rgba(45, 212, 191, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+  top: -150px; 
+  right: -150px;
   pointer-events: none;
 }
 
-.login-brand { position: relative; z-index: 1; margin-bottom: 48px; }
+.login-brand { 
+  position: relative; 
+  z-index: 2; 
+}
+
+.login-brand-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
 
 .login-brand-icon-wrapper {
-  width: 56px; height: 56px;
-  background: rgba(13, 148, 136, 0.2);
-  border: 1px solid rgba(13, 148, 136, 0.4);
+  width: 52px; 
+  height: 52px;
+  background: rgba(13, 148, 136, 0.25);
+  border: 1px solid rgba(45, 212, 191, 0.4);
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
   color: #2dd4bf;
+  box-shadow: 0 8px 24px rgba(13, 148, 136, 0.3);
 }
 
 .login-brand h1 {
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: 800;
-  letter-spacing: -0.04em;
-  margin-bottom: 12px;
+  letter-spacing: -0.03em;
   color: #ffffff;
+  margin: 0;
+  line-height: 1.1;
 }
 
-.login-brand p {
+.scale-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(45, 212, 191, 0.15);
+  border: 1px solid rgba(45, 212, 191, 0.3);
+  color: #5eead4;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.brand-subtext {
   color: #94a3b8;
-  font-size: 1.0625rem;
-  line-height: 1.6;
-  max-width: 420px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 480px;
+  margin-top: 8px;
 }
 
+/* ─── 3D Circular Orbital Showcase Cube Container ───────────────── */
+.showcase-3d-wrapper {
+  position: relative;
+  z-index: 2;
+  margin: 24px 0;
+  perspective: 1200px;
+}
+
+.showcase-3d-stage {
+  width: 100%;
+  max-width: 520px;
+  transform-style: preserve-3d;
+}
+
+.showcase-card {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(45, 212, 191, 0.15);
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: rotateY(0deg) translateZ(0);
+}
+
+.showcase-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  border-color: rgba(45, 212, 191, 0.4);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(45, 212, 191, 0.25);
+}
+
+.card-image-container {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+
+.showcase-ai-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease;
+}
+
+.showcase-card:hover .showcase-ai-image {
+  transform: scale(1.05);
+}
+
+.image-overlay-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.1) 0%, rgba(15, 23, 42, 0.85) 100%);
+}
+
+.card-floating-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.card-content {
+  padding: 20px 24px;
+}
+
+.card-content h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.card-tagline {
+  color: #2dd4bf;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.card-desc {
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ─── Orbital Controls & Dots ───────────────────────────────────── */
+.showcase-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.orbital-nav-btn {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.orbital-nav-btn:hover {
+  background: rgba(45, 212, 191, 0.25);
+  border-color: #2dd4bf;
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.orbital-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.orbital-dot {
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.orbital-dot.active {
+  width: 28px;
+  border-radius: 10px;
+  background: #2dd4bf;
+  box-shadow: 0 0 12px rgba(45, 212, 191, 0.6);
+}
+
+/* ─── Bottom Features List ───────────────────────────────────────── */
 .login-features {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 40px;
-  width: 100%;
-  max-width: 420px;
+  padding-top: 20px;
+  max-width: 520px;
 }
 
 .login-feature-item {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
+  gap: 14px;
 }
 
 .login-feature-icon {
-  width: 36px; height: 36px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 34px; 
+  height: 34px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -88,21 +268,22 @@
 }
 
 .login-feature-text h4 {
-  font-size: 0.9375rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #f8fafc;
   margin-bottom: 2px;
 }
 
 .login-feature-text p {
-  font-size: 0.8125rem;
+  font-size: 0.8rem;
   color: #94a3b8;
   line-height: 1.4;
+  margin: 0;
 }
 
-/* ─── Right panel (Form) ───────────────────────────── */
+/* ─── Right Panel (Form) ─────────────────────────────────────────── */
 .login-right {
-  width: 520px;
+  width: 480px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -117,7 +298,9 @@
   max-width: 380px;
 }
 
-.login-form-header { margin-bottom: 32px; }
+.login-form-header { 
+  margin-bottom: 32px; 
+}
 
 .login-form-header h2 {
   font-size: 1.75rem;
@@ -172,59 +355,6 @@
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-/* ─── Demo Credentials Panel (For Resume/Interview) ── */
-.demo-credentials-box {
-  margin-top: 36px;
-  border-top: 1px solid var(--color-border);
-  padding-top: 24px;
-}
-
-.demo-credentials-title {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-light);
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.demo-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.demo-role-btn {
-  padding: 8px 10px;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.demo-role-btn:hover {
-  background: var(--color-primary-50);
-  border-color: var(--color-primary-light);
-  color: var(--color-primary-dark);
-}
-
-.demo-role-btn span {
-  font-size: 0.65rem;
-  font-weight: 400;
-  color: var(--color-text-light);
 }
 
 @media (max-width: 960px) {

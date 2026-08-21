@@ -1,5 +1,5 @@
-// features/auth/LoginPage.jsx — Enterprise Unified Login with Bot Protection & Password Visibility Toggle
-import React, { useState } from "react";
+// features/auth/LoginPage.jsx — Enterprise Unified Login with 3D Showcase & Bot Protection
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import { loginApi } from "../../api/auth.api";
@@ -14,8 +14,17 @@ import {
   UserCheck,
   Bot,
   Eye,
-  EyeOff
+  EyeOff,
+  Stethoscope,
+  ChevronLeft,
+  ChevronRight,
+  Sparkles
 } from "lucide-react";
+
+import clinicCareImg from "../../assets/images/clinic_care.png";
+import enterpriseHospitalImg from "../../assets/images/enterprise_hospital.png";
+import smartPharmacyImg from "../../assets/images/smart_pharmacy.png";
+
 import "./LoginPage.css";
 
 const DASHBOARD_ROUTES = {
@@ -23,6 +32,33 @@ const DASHBOARD_ROUTES = {
   doctor: "/doctor/dashboard",
   patient: "/patient/dashboard",
 };
+
+const SHOWCASE_SLIDES = [
+  {
+    id: 1,
+    title: "Small Clinics & Solo Practice",
+    badge: "🏡 Small Clinics & Outpatient Care",
+    tagline: "Tailored for solo practitioners & family clinics",
+    description: "Streamlined consultation workflows, paperless digital prescriptions, and fast appointment scheduling for independent practices.",
+    image: clinicCareImg,
+  },
+  {
+    id: 2,
+    title: "Multispecialty Hospitals",
+    badge: "🏥 Enterprise Medical Centers",
+    tagline: "High-capacity hospital telemetry & ward analytics",
+    description: "Multi-department coordination, bed census analytics, emergency routing, and central administrative control for large hospitals.",
+    image: enterpriseHospitalImg,
+  },
+  {
+    id: 3,
+    title: "Smart Pharmacy & 360° Records",
+    badge: "💊 Integrated Pharmacy & Medical History",
+    tagline: "End-to-end drug inventory & lifetime health records",
+    description: "Real-time drug stock alerts, automated pharmacy dispense queues, and unified patient medical timelines accessible securely.",
+    image: smartPharmacyImg,
+  },
+];
 
 const LoginPage = () => {
   const { login } = useAuth();
@@ -34,6 +70,25 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
 
+  // 3D Carousel / Cube Orbital Motion State
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+
+  // Auto-rotate 3D Showcase every 4.5 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlideIndex((prev) => (prev + 1) % SHOWCASE_SLIDES.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleNextSlide = () => {
+    setCurrentSlideIndex((prev) => (prev + 1) % SHOWCASE_SLIDES.length);
+  };
+
+  const handlePrevSlide = () => {
+    setCurrentSlideIndex((prev) => (prev - 1 + SHOWCASE_SLIDES.length) % SHOWCASE_SLIDES.length);
+  };
+
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     if (error) setError("");
@@ -43,14 +98,12 @@ const LoginPage = () => {
     e.preventDefault();
 
     // ─── Bot Protection Check ──────────────────────────────
-    // 1. Honeypot check: If invisible field is filled by a bot, reject
     if (form.website_hp && form.website_hp.trim() !== "") {
       console.warn("🤖 [BOT SECURITY] Honeypot triggered. Request blocked.");
       setError("Automated submission detected by security filters.");
       return;
     }
 
-    // 2. Interactive Bot Protection Checkbox Verification
     if (!isHumanVerified) {
       setError("Please complete the bot protection security check below.");
       return;
@@ -79,48 +132,106 @@ const LoginPage = () => {
     }
   };
 
+  const activeSlide = SHOWCASE_SLIDES[currentSlideIndex];
+
   return (
     <div className="login-page">
-      {/* ─── Left Branding Panel ─────────────────────────── */}
+      {/* ─── Left Branding Panel (3D Cube & Orbital AI Showcase) ─── */}
       <div className="login-left">
         <div className="login-brand">
-          <div className="login-brand-icon-wrapper">
-            <Building2 size={32} />
+          <div className="login-brand-header">
+            <div className="login-brand-icon-wrapper">
+              <Building2 size={32} />
+            </div>
+            <div>
+              <h1>HPMS Healthcare</h1>
+              <div className="scale-pill">
+                <Sparkles size={13} />
+                <span>Engineered for Small Clinics to Enterprise Hospitals</span>
+              </div>
+            </div>
           </div>
-          <h1>HPMS Enterprise</h1>
-          <p>
-            Secure, centralized healthcare management platform engineered for clinical excellence, patient privacy, and real-time hospital administration.
+          <p className="brand-subtext">
+            A unified, scalable hospital & clinic management engine designed for solo practitioners, community health centers, and multi-specialty medical networks.
           </p>
         </div>
 
+        {/* ─── 3D Circular Orbital Showcase Cube Container ─── */}
+        <div className="showcase-3d-wrapper">
+          <div className="showcase-3d-stage">
+            <div className="showcase-card active-3d-card">
+              <div className="card-image-container">
+                <img 
+                  src={activeSlide.image} 
+                  alt={activeSlide.title} 
+                  className="showcase-ai-image" 
+                />
+                <div className="image-overlay-gradient"></div>
+                <div className="card-floating-badge">
+                  <span>{activeSlide.badge}</span>
+                </div>
+              </div>
+              <div className="card-content">
+                <h3>{activeSlide.title}</h3>
+                <p className="card-tagline">{activeSlide.tagline}</p>
+                <p className="card-desc">{activeSlide.description}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* ─── Orbital Controls & Navigation Dots ───────── */}
+          <div className="showcase-controls">
+            <button 
+              type="button" 
+              className="orbital-nav-btn" 
+              onClick={handlePrevSlide}
+              aria-label="Previous Slide"
+            >
+              <ChevronLeft size={18} />
+            </button>
+
+            <div className="orbital-dots">
+              {SHOWCASE_SLIDES.map((slide, idx) => (
+                <button
+                  key={slide.id}
+                  type="button"
+                  className={`orbital-dot ${idx === currentSlideIndex ? "active" : ""}`}
+                  onClick={() => setCurrentSlideIndex(idx)}
+                  title={slide.title}
+                />
+              ))}
+            </div>
+
+            <button 
+              type="button" 
+              className="orbital-nav-btn" 
+              onClick={handleNextSlide}
+              aria-label="Next Slide"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* ─── Bottom Feature Badges ───────────────────────── */}
         <div className="login-features">
           <div className="login-feature-item">
             <div className="login-feature-icon">
-              <ShieldCheck size={20} />
+              <Stethoscope size={18} />
             </div>
             <div className="login-feature-text">
-              <h4>Role-Based Access Control (RBAC)</h4>
-              <p>Granular authorization routing administrators, clinicians, and patients to specialized clinical workspaces.</p>
+              <h4>Solo Clinic & Outpatient Ready</h4>
+              <p>Simple consultation logs, prescription printing, and patient vitals tracking.</p>
             </div>
           </div>
 
           <div className="login-feature-item">
             <div className="login-feature-icon">
-              <Activity size={20} />
+              <ShieldCheck size={18} />
             </div>
             <div className="login-feature-text">
-              <h4>Real-Time Clinical Telemetry</h4>
-              <p>Live patient admission tracking, diagnosis histories, and department-wide census analytics.</p>
-            </div>
-          </div>
-
-          <div className="login-feature-item">
-            <div className="login-feature-icon">
-              <UserCheck size={20} />
-            </div>
-            <div className="login-feature-text">
-              <h4>HIPAA & Anti-Bot Protection</h4>
-              <p>Encrypted sessions with automated honeypot bot defense and rate-limiting safeguards.</p>
+              <h4>Enterprise Security & Anti-Bot Defense</h4>
+              <p>JWT role-based authorization, request throttling, and automated honeypot bot shielding.</p>
             </div>
           </div>
         </div>
