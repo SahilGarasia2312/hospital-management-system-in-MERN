@@ -6,12 +6,10 @@ import { loginApi } from "../../api/auth.api";
 import { 
   Building2, 
   ShieldCheck, 
-  Activity, 
   Lock, 
   Mail, 
   AlertCircle, 
   ArrowRight, 
-  UserCheck,
   Bot,
   Eye,
   EyeOff,
