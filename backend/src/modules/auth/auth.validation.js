@@ -17,7 +17,16 @@ export const loginValidation = [
     .isString()
     .withMessage("Password must be a string")
     .notEmpty({ ignore_whitespace: true })
-    .withMessage("Password is required")
+    .withMessage("Password is required"),
+
+  body("website_hp")
+    .optional()
+    .custom((value) => {
+      if (value && value.trim() !== "") {
+        throw new Error("Automated bot submission detected by security filters.");
+      }
+      return true;
+    })
 ];
 
 export const registerValidation = [

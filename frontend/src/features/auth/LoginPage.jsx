@@ -1,5 +1,4 @@
-// features/auth/LoginPage.jsx — Enterprise Unified Login (No Role Selection Tabs)
-// feature: Professional single login point. Backend RBAC determines role dynamically.
+// features/auth/LoginPage.jsx — Enterprise Unified Login with Bot Protection Security
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
@@ -12,8 +11,8 @@ import {
   Mail, 
   AlertCircle, 
   ArrowRight, 
-  Info,
-  UserCheck
+  UserCheck,
+  Bot
 } from "lucide-react";
 import "./LoginPage.css";
 
@@ -23,17 +22,12 @@ const DASHBOARD_ROUTES = {
   patient: "/patient/dashboard",
 };
 
-const DEMO_ACCOUNTS = [
-  { label: "Admin Access",   role: "System Admin", email: "admin@hpms.com",        password: "Admin@123" },
-  { label: "Doctor Portal",  role: "Cardiologist", email: "arjun.sharma@hpms.com", password: "Doctor@123" },
-  { label: "Patient Record", role: "Outpatient",   email: "ravi.kumar@hpms.com",   password: "Patient@123" },
-];
-
 const LoginPage = () => {
   const { login } = useAuth();
   const navigate  = useNavigate();
 
-  const [form, setForm]       = useState({ email: "", password: "" });
+  const [form, setForm]       = useState({ email: "", password: "", website_hp: "" });
+  const [isHumanVerified, setIsHumanVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
 
@@ -42,27 +36,34 @@ const LoginPage = () => {
     if (error) setError("");
   };
 
-  // Allow recruiters/testers to quickly populate credentials
-  const handleSelectDemo = (account) => {
-    setForm({ email: account.email, password: account.password });
-    setError("");
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // ─── Bot Protection Check ──────────────────────────────
+    // 1. Honeypot check: If invisible field is filled by a bot, reject
+    if (form.website_hp && form.website_hp.trim() !== "") {
+      console.warn("🤖 [BOT SECURITY] Honeypot triggered. Request blocked.");
+      setError("Automated submission detected by security filters.");
+      return;
+    }
+
+    // 2. Interactive Bot Protection Checkbox Verification
+    if (!isHumanVerified) {
+      setError("Please complete the bot protection security check below.");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
-    // improvement: Added client-side logging for login debugging
     console.log("[AUTH DEBUG] Submitting login payload:", { email: form.email });
 
     try {
-      const res = await loginApi(form);
+      const res = await loginApi({ email: form.email, password: form.password, website_hp: form.website_hp });
       console.log("[AUTH DEBUG] Login API response:", res);
       const { token, user } = res.data;
       
       console.log("[AUTH DEBUG] User authenticated successfully:", user);
-      // Store session and redirect based on backend-authenticated RBAC role
       login(token, user);
       const targetRoute = DASHBOARD_ROUTES[user.role] || "/";
       console.log("[AUTH DEBUG] Navigating to target route:", targetRoute);
@@ -77,7 +78,7 @@ const LoginPage = () => {
 
   return (
     <div className="login-page">
-      {/* ─── Left Branding Panel (Enterprise Value Prop) ─── */}
+      {/* ─── Left Branding Panel ─────────────────────────── */}
       <div className="login-left">
         <div className="login-brand">
           <div className="login-brand-icon-wrapper">
@@ -115,14 +116,14 @@ const LoginPage = () => {
               <UserCheck size={20} />
             </div>
             <div className="login-feature-text">
-              <h4>HIPAA-Ready Security Architecture</h4>
-              <p>Encrypted JSON Web Token (JWT) sessions with automated expiration and token verification.</p>
+              <h4>HIPAA & Anti-Bot Protection</h4>
+              <p>Encrypted sessions with automated honeypot bot defense and rate-limiting safeguards.</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ─── Right Form Panel (Unified Login) ───────────── */}
+      {/* ─── Right Form Panel ────────────────────────────── */}
       <div className="login-right">
         <div className="login-form-wrapper">
           <div className="login-form-header">
@@ -138,6 +139,17 @@ const LoginPage = () => {
           )}
 
           <form onSubmit={handleSubmit}>
+            {/* Honeypot hidden input for Bot Protection */}
+            <input
+              type="text"
+              name="website_hp"
+              value={form.website_hp}
+              onChange={handleChange}
+              style={{ display: "none", position: "absolute", left: "-9999px" }}
+              tabIndex="-1"
+              autoComplete="off"
+            />
+
             <div className="form-group">
               <label className="form-label" htmlFor="login-email">
                 Email Address
@@ -182,6 +194,47 @@ const LoginPage = () => {
               </div>
             </div>
 
+            {/* ─── Bot Protection Verification Box ───────── */}
+            <div 
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                padding: "12px",
+                marginBottom: "20px",
+                background: isHumanVerified ? "#f0fdf4" : "#f8fafc",
+                border: isHumanVerified ? "1px solid #bbf7d0" : "1px solid #e2e8f0",
+                borderRadius: "8px",
+                cursor: "pointer",
+                userSelect: "none",
+                transition: "all 0.2s ease"
+              }}
+              onClick={() => setIsHumanVerified(!isHumanVerified)}
+            >
+              <input
+                id="bot-protection-checkbox"
+                type="checkbox"
+                checked={isHumanVerified}
+                onChange={(e) => setIsHumanVerified(e.target.checked)}
+                style={{ width: "18px", height: "18px", cursor: "pointer", accentColor: "#0284c7" }}
+              />
+              <label 
+                htmlFor="bot-protection-checkbox"
+                style={{ 
+                  fontSize: "0.875rem", 
+                  color: isHumanVerified ? "#15803d" : "#475569", 
+                  cursor: "pointer",
+                  fontWeight: 500,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px"
+                }}
+              >
+                <Bot size={16} />
+                <span>I am not a bot (Security Check)</span>
+              </label>
+            </div>
+
             <button
               type="submit"
               className="btn btn-primary btn-login"
@@ -191,28 +244,6 @@ const LoginPage = () => {
               {!loading && <ArrowRight size={18} />}
             </button>
           </form>
-
-          {/* ─── Interviewer / Recruiter Quick Test Helper ─── */}
-          <div className="demo-credentials-box">
-            <div className="demo-credentials-title">
-              <Info size={14} />
-              <span>Quick Test Credentials (For Reviewers)</span>
-            </div>
-            <div className="demo-grid">
-              {DEMO_ACCOUNTS.map((acc, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  className="demo-role-btn"
-                  onClick={() => handleSelectDemo(acc)}
-                  title={`Click to fill ${acc.label} credentials`}
-                >
-                  <strong>{acc.label}</strong>
-                  <span>{acc.role}</span>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>
