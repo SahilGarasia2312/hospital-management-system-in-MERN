@@ -1,4 +1,4 @@
-// routes/AppRoutes.jsx — Centralized route definitions with Lucide icons
+// routes/AppRoutes.jsx — Centralized route definitions with Lucide icons & Appointments Calendar
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
@@ -20,11 +20,14 @@ import DoctorDetail     from "../features/doctor/DoctorDetail";
 // Patient
 import PatientDashboard from "../features/patient/PatientDashboard";
 
+// Appointments
+import AppointmentsPage from "../features/appointments/AppointmentsPage";
+
 // Unauthorized page
 const Unauthorized = () => (
   <div className="unauthorized-page">
     <div className="unauth-card">
-      <div style={{ display: "flex", justify: "center", color: "#ef4444", marginBottom: "16px" }}>
+      <div style={{ display: "flex", justifyContent: "center", color: "#ef4444", marginBottom: "16px" }}>
         <ShieldAlert size={56} />
       </div>
       <h2>Access Restricted</h2>
@@ -62,17 +65,20 @@ const AppRoutes = () => {
         <Route path="/admin"              element={<AdminDashboard />} />
         <Route path="/admin/doctors"      element={<ManageDoctors />} />
         <Route path="/admin/patients"     element={<ManagePatients />} />
+        <Route path="/admin/appointments" element={<AppointmentsPage />} />
       </Route>
 
       {/* Doctor Routes (admin can also view) */}
       <Route element={<ProtectedRoute allowedRoles={["admin", "doctor"]} />}>
-        <Route path="/doctor/dashboard"      element={<DoctorDashboard />} />
-        <Route path="/doctor/:doctorId"      element={<DoctorDetail />} />
+        <Route path="/doctor/dashboard"    element={<DoctorDashboard />} />
+        <Route path="/doctor/appointments" element={<AppointmentsPage />} />
+        <Route path="/doctor/:doctorId"    element={<DoctorDetail />} />
       </Route>
 
       {/* Patient Routes */}
       <Route element={<ProtectedRoute allowedRoles={["patient"]} />}>
-        <Route path="/patient/dashboard" element={<PatientDashboard />} />
+        <Route path="/patient/dashboard"    element={<PatientDashboard />} />
+        <Route path="/patient/appointments" element={<AppointmentsPage />} />
       </Route>
 
       {/* Misc */}

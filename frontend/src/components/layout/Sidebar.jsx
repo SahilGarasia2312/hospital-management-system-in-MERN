@@ -3,13 +3,14 @@ import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import Badge from "../common/Badge";
-import { 
-  Building2, 
-  LayoutDashboard, 
-  Stethoscope, 
-  Users, 
-  ClipboardList, 
-  LogOut 
+import {
+  Building2,
+  LayoutDashboard,
+  Stethoscope,
+  Users,
+  ClipboardList,
+  Calendar,
+  LogOut,
 } from "lucide-react";
 
 const NAV_ITEMS = {
@@ -17,12 +18,15 @@ const NAV_ITEMS = {
     { label: "Dashboard",       icon: <LayoutDashboard size={18} />, path: "/admin" },
     { label: "Manage Doctors",  icon: <Stethoscope size={18} />,     path: "/admin/doctors" },
     { label: "Manage Patients", icon: <Users size={18} />,           path: "/admin/patients" },
+    { label: "Appointments",    icon: <Calendar size={18} />,        path: "/admin/appointments" },
   ],
   doctor: [
     { label: "My Dashboard",    icon: <LayoutDashboard size={18} />, path: "/doctor/dashboard" },
+    { label: "Appointments",    icon: <Calendar size={18} />,        path: "/doctor/appointments" },
   ],
   patient: [
     { label: "My Records",      icon: <ClipboardList size={18} />,   path: "/patient/dashboard" },
+    { label: "My Appointments", icon: <Calendar size={18} />,        path: "/patient/appointments" },
   ],
 };
 
