@@ -10,7 +10,12 @@ import {
   patientIdParamValidation,
 } from "./patient.validation.js";
 
+import timelineRoutes from "../timeline/timeline.routes.js";
+
 const router = express.Router();
+
+// Mount nested timeline routes for patient 360
+router.use("/:patientId/timeline", timelineRoutes);
 
 // All patient routes require authentication
 router.use(verifyTokenMiddleware);
