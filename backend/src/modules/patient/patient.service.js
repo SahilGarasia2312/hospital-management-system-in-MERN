@@ -44,7 +44,20 @@ export const getPatientById = async (patientId) => {
 
 /** Create a patient under a specific doctor */
 export const createPatient = async (data) => {
-  const { doctorId: numericDoctorId, ...rest } = data;
+  const {
+    doctorId: numericDoctorId,
+    name,
+    age,
+    gender,
+    contact,
+    disease,
+    symptoms,
+    medicinePrescribed,
+    admissionStatus,
+    admittedDate,
+    releasingDate,
+    releasingSummary
+  } = data;
 
   const doctor = await Doctor.findOne({ doctorId: Number(numericDoctorId) });
   if (!doctor) {
@@ -52,14 +65,64 @@ export const createPatient = async (data) => {
   }
 
   const patientId = await generatePatientId();
-  return Patient.create({ ...rest, patientId, doctorId: doctor._id });
+  const patientData = {
+    patientId,
+    doctorId: doctor._id,
+    name,
+    age,
+    gender,
+    contact,
+    disease,
+    symptoms,
+    medicinePrescribed,
+    admissionStatus,
+    admittedDate,
+    releasingDate,
+    releasingSummary
+  };
+
+  // Clean up undefined fields
+  Object.keys(patientData).forEach(key => patientData[key] === undefined && delete patientData[key]);
+
+  return Patient.create(patientData);
 };
 
 /** Update a patient record */
 export const updatePatient = async (patientId, data) => {
+  const {
+    name,
+    age,
+    gender,
+    contact,
+    disease,
+    symptoms,
+    medicinePrescribed,
+    admissionStatus,
+    admittedDate,
+    releasingDate,
+    releasingSummary
+  } = data;
+
+  const updateData = {
+    name,
+    age,
+    gender,
+    contact,
+    disease,
+    symptoms,
+    medicinePrescribed,
+    admissionStatus,
+    admittedDate,
+    releasingDate,
+    releasingSummary
+  };
+
+  // Clean up undefined fields
+  Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+
   const patient = await Patient.findOneAndUpdate(
     { patientId: Number(patientId) },
-    { $set: data },
+    { $set: updateData },
     { new: true, runValidators: true }
   );
   if (!patient) {

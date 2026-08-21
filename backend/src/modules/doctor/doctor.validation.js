@@ -22,10 +22,19 @@ export const createDoctorValidation = [
   body("specialization")
     .isString()
     .withMessage("Specialization must be a string")
+    .trim()
     .notEmpty({ ignore_whitespace: true })
     .withMessage("Specialization is required")
-    .isIn(SPECIALIZATIONS)
-    .withMessage("Invalid specialization"),
+    .custom((val, { req }) => {
+      const match = SPECIALIZATIONS.find(
+        (s) => s.toLowerCase() === val.trim().toLowerCase()
+      );
+      if (!match) {
+        throw new Error(`Invalid specialization. Allowed values: ${SPECIALIZATIONS.join(", ")}`);
+      }
+      req.body.specialization = match;
+      return true;
+    }),
 
   body("experience")
     .notEmpty()
@@ -66,8 +75,18 @@ export const updateDoctorValidation = [
     .optional()
     .isString()
     .withMessage("Specialization must be a string")
-    .isIn(SPECIALIZATIONS)
-    .withMessage("Invalid specialization"),
+    .trim()
+    .custom((val, { req }) => {
+      if (!val) return true;
+      const match = SPECIALIZATIONS.find(
+        (s) => s.toLowerCase() === val.trim().toLowerCase()
+      );
+      if (!match) {
+        throw new Error(`Invalid specialization. Allowed values: ${SPECIALIZATIONS.join(", ")}`);
+      }
+      req.body.specialization = match;
+      return true;
+    }),
 
   body("experience")
     .optional()

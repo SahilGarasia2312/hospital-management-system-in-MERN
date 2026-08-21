@@ -6,10 +6,16 @@ import { getDoctorsApi, deleteDoctorApi } from "../../api/doctor.api";
 import Spinner from "../../components/common/Spinner";
 import Badge from "../../components/common/Badge";
 import { Stethoscope, Plus, Edit2, Trash2, Mail } from "lucide-react";
+import DoctorFormModal from "./DoctorFormModal";
 
 const ManageDoctors = () => {
   const { data: doctors, loading, refetch } = useFetch(getDoctorsApi);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("add"); // "add" or "edit"
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Confirm deletion: This will remove the physician and cascade delete associated patient records.")) return;
@@ -24,6 +30,18 @@ const ManageDoctors = () => {
     }
   };
 
+  const handleOpenAddModal = () => {
+    setModalMode("add");
+    setSelectedDoctor(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (doctor) => {
+    setModalMode("edit");
+    setSelectedDoctor(doctor);
+    setIsModalOpen(true);
+  };
+
   return (
     <AppLayout title="Clinician Directory">
       <div className="page-header page-header-row">
@@ -31,7 +49,7 @@ const ManageDoctors = () => {
           <h1>Medical Staff</h1>
           <p>Manage hospital physicians, surgeons, and departmental specializations.</p>
         </div>
-        <button className="btn btn-primary" style={{ gap: "8px" }}>
+        <button className="btn btn-primary" style={{ gap: "8px" }} onClick={handleOpenAddModal}>
           <Plus size={18} />
           <span>Add Clinician</span>
         </button>
@@ -67,7 +85,12 @@ const ManageDoctors = () => {
                       </div>
                     </td>
                     <td style={{ textAlign: "right" }}>
-                      <button className="btn btn-ghost btn-icon" title="Edit Physician" style={{ marginRight: "4px" }}>
+                      <button 
+                        className="btn btn-ghost btn-icon" 
+                        title="Edit Physician" 
+                        style={{ marginRight: "4px" }}
+                        onClick={() => handleOpenEditModal(doc)}
+                      >
                         <Edit2 size={16} />
                       </button>
                       <button 
@@ -100,6 +123,14 @@ const ManageDoctors = () => {
           </div>
         )}
       </div>
+
+      <DoctorFormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        mode={modalMode}
+        initialData={selectedDoctor}
+        onSuccess={refetch}
+      />
     </AppLayout>
   );
 };

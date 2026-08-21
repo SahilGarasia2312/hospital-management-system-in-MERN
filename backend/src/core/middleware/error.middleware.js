@@ -15,7 +15,16 @@ export const errorHandler = (err, req, res, next) => {
   // Mongoose validation error
   if (err.name === "ValidationError") {
     const messages = Object.values(err.errors).map((e) => e.message);
-    return res.status(400).json({ success: false, message: "Validation failed", errors: messages });
+    const summaryMessage = messages.length > 0 ? `Validation failed: ${messages.join(". ")}` : "Validation failed";
+    return res.status(400).json({ success: false, message: summaryMessage, errors: messages });
+  }
+
+  // Mongoose cast error (invalid type)
+  if (err.name === "CastError") {
+    return res.status(400).json({
+      success: false,
+      message: err.path ? `Invalid value provided for field: ${err.path}` : "Invalid value provided"
+    });
   }
 
   // Mongoose duplicate key error (e.g. unique email)

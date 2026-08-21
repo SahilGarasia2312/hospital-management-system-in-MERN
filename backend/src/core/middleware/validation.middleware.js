@@ -10,6 +10,9 @@ import { BadRequestError } from "../errors/index.js";
 export const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.error("❌ [VALIDATION FAILED] Body:", JSON.stringify(req.body, null, 2));
+    console.error("❌ [VALIDATION ERRORS]:", JSON.stringify(errors.array(), null, 2));
+
     // Extract error messages, including path for better field-level info if msg is generic
     const messages = errors.array().map((err) => {
       // Avoid prefixing if the message already seems descriptive enough or if path is missing
@@ -18,7 +21,12 @@ export const validateRequest = (req, res, next) => {
         : err.msg;
     });
 
-    const error = new BadRequestError("Validation failed");
+    const summaryMessage =
+      messages.length > 0
+        ? `Validation failed: ${messages.join(". ")}`
+        : "Validation failed";
+
+    const error = new BadRequestError(summaryMessage);
     error.errors = messages;
     return next(error);
   }

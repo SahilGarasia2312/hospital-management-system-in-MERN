@@ -3,6 +3,12 @@ import express from "express";
 import * as patientController from "./patient.controller.js";
 import { verifyTokenMiddleware } from "../../core/middleware/auth.middleware.js";
 import { requireRole } from "../../core/middleware/role.middleware.js";
+import { validateRequest } from "../../core/middleware/validation.middleware.js";
+import {
+  createPatientValidation,
+  updatePatientValidation,
+  patientIdParamValidation,
+} from "./patient.validation.js";
 
 const router = express.Router();
 
@@ -16,15 +22,40 @@ router.get("/stats", requireRole("admin"), patientController.getPatientStats);
 router.get("/", requireRole("admin", "doctor", "patient"), patientController.getAllPatients);
 
 // GET /api/patients/:patientId — Admin + Doctor
-router.get("/:patientId", requireRole("admin", "doctor", "patient"), patientController.getPatientById);
+router.get(
+  "/:patientId",
+  requireRole("admin", "doctor", "patient"),
+  patientIdParamValidation,
+  validateRequest,
+  patientController.getPatientById
+);
 
 // POST /api/patients — Admin + Doctor
-router.post("/", requireRole("admin", "doctor"), patientController.createPatient);
+router.post(
+  "/",
+  requireRole("admin", "doctor"),
+  createPatientValidation,
+  validateRequest,
+  patientController.createPatient
+);
 
 // PUT /api/patients/:patientId — Admin + Doctor
-router.put("/:patientId", requireRole("admin", "doctor"), patientController.updatePatient);
+router.put(
+  "/:patientId",
+  requireRole("admin", "doctor"),
+  patientIdParamValidation,
+  updatePatientValidation,
+  validateRequest,
+  patientController.updatePatient
+);
 
 // DELETE /api/patients/:patientId — Admin only
-router.delete("/:patientId", requireRole("admin"), patientController.deletePatient);
+router.delete(
+  "/:patientId",
+  requireRole("admin"),
+  patientIdParamValidation,
+  validateRequest,
+  patientController.deletePatient
+);
 
 export default router;

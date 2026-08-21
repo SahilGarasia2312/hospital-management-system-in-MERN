@@ -1,14 +1,20 @@
 // features/admin/ManagePatients.jsx — Enterprise Patient Records with Lucide Icons
-import React from "react";
+import React, { useState } from "react";
 import AppLayout from "../../components/layout/AppLayout";
 import useFetch from "../../hooks/useFetch";
 import { getPatientsApi, deletePatientApi } from "../../api/patient.api";
 import Spinner from "../../components/common/Spinner";
 import Badge from "../../components/common/Badge";
 import { Users, Plus, Eye, Trash2, Stethoscope } from "lucide-react";
+import PatientFormModal from "./PatientFormModal";
+import PatientViewModal from "./PatientViewModal";
 
 const ManagePatients = () => {
   const { data: patients, loading, refetch } = useFetch(getPatientsApi);
+
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Confirm deletion: Are you sure you want to permanently delete this patient record?")) return;
@@ -20,6 +26,15 @@ const ManagePatients = () => {
     }
   };
 
+  const handleOpenRegister = () => {
+    setIsFormModalOpen(true);
+  };
+
+  const handleViewPatient = (patient) => {
+    setSelectedPatient(patient);
+    setIsViewModalOpen(true);
+  };
+
   return (
     <AppLayout title="Patient Master Index">
       <div className="page-header page-header-row">
@@ -27,7 +42,7 @@ const ManagePatients = () => {
           <h1>Patient Registry</h1>
           <p>Centralized database of inpatient admissions and outpatient visits.</p>
         </div>
-        <button className="btn btn-primary" style={{ gap: "8px" }}>
+        <button className="btn btn-primary" style={{ gap: "8px" }} onClick={handleOpenRegister}>
           <Plus size={18} />
           <span>Register Patient</span>
         </button>
@@ -67,7 +82,12 @@ const ManagePatients = () => {
                       </div>
                     </td>
                     <td style={{ textAlign: "right" }}>
-                      <button className="btn btn-ghost btn-icon" title="View Chart" style={{ marginRight: "4px" }}>
+                      <button 
+                        className="btn btn-ghost btn-icon" 
+                        title="View Chart" 
+                        style={{ marginRight: "4px" }}
+                        onClick={() => handleViewPatient(pat)}
+                      >
                         <Eye size={16} />
                       </button>
                       <button 
@@ -99,6 +119,18 @@ const ManagePatients = () => {
           </div>
         )}
       </div>
+
+      <PatientFormModal 
+        isOpen={isFormModalOpen}
+        onClose={() => setIsFormModalOpen(false)}
+        onSuccess={refetch}
+      />
+      
+      <PatientViewModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        patient={selectedPatient}
+      />
     </AppLayout>
   );
 };

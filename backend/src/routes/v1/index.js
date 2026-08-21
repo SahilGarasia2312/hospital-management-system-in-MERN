@@ -2,11 +2,15 @@ import express from "express";
 import authRoutes from "../../modules/auth/auth.routes.js";
 import doctorRoutes from "../../modules/doctor/doctor.routes.js";
 import patientRoutes from "../../modules/patient/patient.routes.js";
+import appointmentRoutes from "../../modules/appointment/appointment.routes.js";
+import visitRoutes from "../../modules/visit/visit.routes.js";
 
 const router = express.Router();
 
 router.use("/auth", authRoutes);
 router.use("/doctors", doctorRoutes);
 router.use("/patients", patientRoutes);
+router.use("/appointments", appointmentRoutes);
+router.use("/visits", visitRoutes);
 
 export default router;

@@ -34,6 +34,16 @@ describe("QA Unit Test: Doctor Validation Rules", () => {
       expect(res.status).toBe(201);
     });
 
+    it("should pass with department specialization (Dermatology)", async () => {
+      const res = await request(app).post("/doctors").send({ ...validDoctorPayload, specialization: "Dermatology" });
+      expect(res.status).toBe(201);
+    });
+
+    it("should pass with case-insensitive specialization (dermatology)", async () => {
+      const res = await request(app).post("/doctors").send({ ...validDoctorPayload, specialization: "dermatology" });
+      expect(res.status).toBe(201);
+    });
+
     it("should fail if name is missing", async () => {
       const { name, ...payload } = validDoctorPayload;
       const res = await request(app).post("/doctors").send(payload);

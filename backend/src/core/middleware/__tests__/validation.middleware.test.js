@@ -47,7 +47,7 @@ describe("QA Unit Test: validation.middleware", () => {
     const errArg = next.mock.calls[0][0];
 
     expect(errArg).toBeInstanceOf(BadRequestError);
-    expect(errArg.message).toBe("Validation failed");
+    expect(errArg.message).toBe("Validation failed: Email is required");
     expect(errArg.statusCode).toBe(400);
     expect(errArg.errors).toBeDefined();
     expect(Array.isArray(errArg.errors)).toBe(true);
