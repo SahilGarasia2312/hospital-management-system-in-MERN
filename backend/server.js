@@ -1,26 +1,46 @@
 // server.js — Fortified Enterprise Application Entry Point
 import "dotenv/config";
+import mongoose from "mongoose";
 import { connectDB } from "./src/config/db.js";
+import { config } from "./src/config/env.js";
 import app from "./src/app.js";
 
-const PORT = process.env.PORT || 8000;
+const PORT = config.port;
+let server;
 
-// ─── fix: Start server ONLY after DB connects so Render health-check doesn't
-//     pass prematurely and serve 503s on every route. ─────────────────────────
 const startServer = async () => {
   try {
-    await connectDB(); // wait for MongoDB before opening the HTTP port
-    // fix: Bind to 0.0.0.0 (all interfaces) — Render's reverse proxy sends traffic
-    //      to the container's external interface; binding to localhost (127.0.0.1 default)
-    //      makes the process unreachable from outside → 503 on every route.
-    app.listen(PORT, "0.0.0.0", () =>
-      console.log(`🚀 HPMS Server running on http://0.0.0.0:${PORT}`)
+    await connectDB(); // wait for MongoDB before opening HTTP port
+    server = app.listen(PORT, "0.0.0.0", () =>
+      console.log(`🚀 HPMS Server running in [${config.env}] on http://0.0.0.0:${PORT}`)
     );
   } catch (err) {
-    // connectDB already logs the error and exits, but guard here too
     console.error("❌ Fatal startup error:", err.message);
     process.exit(1);
   }
 };
+
+// ─── Graceful Shutdown Handler ────────────────────────────────────────────────
+const gracefulShutdown = (signal) => {
+  console.log(`\n⚠️ ${signal} received. Initiating graceful shutdown...`);
+  if (server) {
+    server.close(async () => {
+      console.log("🔒 HTTP server closed.");
+      try {
+        await mongoose.connection.close();
+        console.log("📦 MongoDB connection closed cleanly.");
+        process.exit(0);
+      } catch (err) {
+        console.error("❌ Error closing MongoDB connection:", err.message);
+        process.exit(1);
+      }
+    });
+  } else {
+    process.exit(0);
+  }
+};
+
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
 startServer();

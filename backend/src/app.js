@@ -7,18 +7,27 @@ import morgan from "morgan";
 import mongoose from "mongoose";
 import apiRoutes from "./routes/index.js";
 import { errorHandler } from "./core/middleware/error.middleware.js";
+import { requestIdMiddleware } from "./core/middleware/request-id.middleware.js";
+import { config, validateEnv } from "./config/env.js";
+
+// Validate environment on load
+validateEnv();
 
 const app = express();
 
+// ─── 0. Request Correlation ID ───────────────────────────────────────────────
+app.use(requestIdMiddleware);
+
 // ─── 1. CORS & Preflight (MUST BE FIRST before Helmet & Rate Limiter) ─────────
-app.use(cors({ origin: true, credentials: true }));
-app.options("*", cors({ origin: true, credentials: true }));
+const allowedOrigin = config.corsOrigin === "*" ? true : config.corsOrigin;
+app.use(cors({ origin: allowedOrigin, credentials: true }));
+app.options("*", cors({ origin: allowedOrigin, credentials: true }));
 
 // ─── 2. Security & HTTP Header Hardening (`helmet`) ──────────────────────────
 app.use(helmet({ crossOriginResourcePolicy: false }));
 
 // ─── 3. HTTP Request Logging & Telemetry (`morgan`) ──────────────────────────
-app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
+app.use(morgan(config.isProduction ? "combined" : "dev"));
 
 // ─── 4. Rate Limiting (Prevent Brute Force & DDoS) ───────────────────────────
 const limiter = rateLimit({
@@ -33,23 +42,37 @@ app.use("/api/", limiter);
 // ─── 5. Body Parsing & NoSQL Injection Sanitization ──────────────────────────
 app.use(express.json({ limit: "10kb" })); // prevent payload exhaustion attacks
 
-// ─── 5. NoSQL Injection & Query Sanitization ─────────────────────────────────
+// ─── 6. NoSQL Injection & Query Sanitization ─────────────────────────────────
 app.use(mongoSanitize()); // strips out $ and . operators from req.body/query/params
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use("/api", apiRoutes);
 
-// Health check & API Root
+// ─── Health (Liveness) Endpoint ───────────────────────────────────────────────
 app.get("/api/health", (req, res) => res.status(200).json({
   status: "ok",
-  dbConnected: mongoose.connection.readyState === 1,
-  timestamp: new Date()
+  service: "hpms-backend",
+  environment: config.env,
+  timestamp: new Date().toISOString()
 }));
+
+// ─── Readiness Endpoint (Checks DB Connection State) ─────────────────────────
+app.get("/api/ready", (req, res) => {
+  const isDbConnected = mongoose.connection.readyState === 1;
+  const statusCode = isDbConnected ? 200 : 503;
+  return res.status(statusCode).json({
+    status: isDbConnected ? "ready" : "unhealthy",
+    service: "hpms-backend",
+    dbConnected: isDbConnected,
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.get("/", (req, res) => res.status(200).json({
-  message: "🚀 HPMS Enterprise Backend API is Live & Connected to MongoDB Atlas!",
+  message: "🚀 HPMS Enterprise Backend API is Live!",
   status: "active",
   dbConnected: mongoose.connection.readyState === 1,
-  endpoints: ["/api/v1/auth", "/api/v1/doctors", "/api/v1/patients", "/api/health"]
+  endpoints: ["/api/v1/auth", "/api/v1/doctors", "/api/v1/patients", "/api/health", "/api/ready"]
 }));
 
 // ─── Global Error Handler (must be last) ─────────────────────────────────────

@@ -10,23 +10,28 @@ import {
   Users,
   ClipboardList,
   Calendar,
+  Pill,
+  Activity,
   LogOut,
 } from "lucide-react";
 
 const NAV_ITEMS = {
   admin: [
-    { label: "Dashboard",       icon: <LayoutDashboard size={18} />, path: "/admin" },
-    { label: "Manage Doctors",  icon: <Stethoscope size={18} />,     path: "/admin/doctors" },
-    { label: "Manage Patients", icon: <Users size={18} />,           path: "/admin/patients" },
-    { label: "Appointments",    icon: <Calendar size={18} />,        path: "/admin/appointments" },
+    { label: "Dashboard",          icon: <LayoutDashboard size={18} />, path: "/admin" },
+    { label: "Manage Doctors",     icon: <Stethoscope size={18} />,     path: "/admin/doctors" },
+    { label: "Manage Patients",    icon: <Users size={18} />,           path: "/admin/patients" },
+    { label: "Appointments",       icon: <Calendar size={18} />,        path: "/admin/appointments" },
+    { label: "Pharmacy Queue",     icon: <Pill size={18} />,            path: "/admin/pharmacy" },
+    { label: "Medicine Catalog",   icon: <ClipboardList size={18} />,   path: "/admin/medicines" },
   ],
   doctor: [
-    { label: "My Dashboard",    icon: <LayoutDashboard size={18} />, path: "/doctor/dashboard" },
-    { label: "Appointments",    icon: <Calendar size={18} />,        path: "/doctor/appointments" },
+    { label: "My Dashboard",       icon: <LayoutDashboard size={18} />, path: "/doctor/dashboard" },
+    { label: "Appointments",       icon: <Calendar size={18} />,        path: "/doctor/appointments" },
   ],
   patient: [
-    { label: "My Records",      icon: <ClipboardList size={18} />,   path: "/patient/dashboard" },
-    { label: "My Appointments", icon: <Calendar size={18} />,        path: "/patient/appointments" },
+    { label: "My Dashboard",       icon: <ClipboardList size={18} />,   path: "/patient/dashboard" },
+    { label: "My Appointments",    icon: <Calendar size={18} />,        path: "/patient/appointments" },
+    { label: "360° Medical History", icon: <Activity size={18} />,      path: "/patient/history" },
   ],
 };
 
@@ -48,7 +53,7 @@ const Sidebar = () => {
 
   return (
     <aside className="sidebar">
-      {/* ─── Brand ─────────────────────────────────────── */}
+      {/* Brand */}
       <div className="sidebar-header">
         <div className="sidebar-logo">
           <div className="sidebar-logo-icon">
@@ -61,7 +66,7 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* ─── Navigation ────────────────────────────────── */}
+      {/* Navigation */}
       <nav className="sidebar-nav">
         <p className="nav-section-label">Navigation</p>
         {navItems.map((item) => (
@@ -79,7 +84,7 @@ const Sidebar = () => {
         ))}
       </nav>
 
-      {/* ─── User Footer ───────────────────────────────── */}
+      {/* User Footer */}
       <div className="sidebar-footer">
         <div className="sidebar-user">
           <div className="sidebar-user-avatar">{initials}</div>

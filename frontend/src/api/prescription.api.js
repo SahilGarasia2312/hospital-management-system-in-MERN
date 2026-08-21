@@ -10,8 +10,8 @@ export const getPrescriptionByIdApi = (prescriptionId) =>
 export const createPrescriptionApi = (data) =>
   api.post("/prescriptions", data).then((r) => r.data);
 
-export const fulfillPrescriptionApi = (prescriptionId, items) =>
-  api.patch(`/prescriptions/${prescriptionId}/fulfill`, { items }).then((r) => r.data);
+export const dispensePrescriptionApi = (prescriptionId, dispenseItems) =>
+  api.patch(`/prescriptions/${prescriptionId}/dispense`, { dispenseItems }).then((r) => r.data);
 
 export const cancelPrescriptionApi = (prescriptionId, cancellationReason) =>
   api.patch(`/prescriptions/${prescriptionId}/cancel`, { cancellationReason }).then((r) => r.data);

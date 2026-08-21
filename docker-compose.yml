@@ -1,0 +1,68 @@
+# ─── Docker Compose for Local Development & Testing ─────────────────────────
+name: hpms
+
+services:
+  # ─── 1. MongoDB Database Container ─────────────────────────────────────────
+  mongodb:
+    image: mongo:7.0-noble
+    container_name: hpms-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: hpms
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - hpms-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── 2. Backend API Container ──────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: hpms-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      PORT: 8000
+      NODE_ENV: development
+      MONGO_URI: mongodb://mongodb:27017/hpms
+      JWT_SECRET: dev_jwt_secret_key_change_in_production_12345
+      JWT_EXPIRES_IN: 7d
+      CORS_ORIGIN: "*"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - hpms-network
+
+  # ─── 3. Frontend Static Web Server ────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: http://localhost:8000/api/v1
+    container_name: hpms-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - hpms-network
+
+networks:
+  hpms-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local

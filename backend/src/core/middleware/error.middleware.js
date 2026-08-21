@@ -10,13 +10,14 @@ import { AppError } from "../errors/index.js";
  *   app.use(errorHandler); // <- must be last
  */
 export const errorHandler = (err, req, res, next) => {
-  console.error(`❌ [${new Date().toISOString()}] ${err.stack || err.message}`);
+  const reqId = req.id ? ` [ReqID: ${req.id}]` : "";
+  console.error(`❌ [${new Date().toISOString()}]${reqId} ${err.stack || err.message}`);
 
   // Mongoose validation error
   if (err.name === "ValidationError") {
     const messages = Object.values(err.errors).map((e) => e.message);
     const summaryMessage = messages.length > 0 ? `Validation failed: ${messages.join(". ")}` : "Validation failed";
-    return res.status(400).json({ success: false, message: summaryMessage, errors: messages });
+    return res.status(400).json({ success: false, message: summaryMessage, errors: messages, requestId: req.id });
   }
 
   // Mongoose cast error (invalid type)

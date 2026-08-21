@@ -1,4 +1,4 @@
-// routes/AppRoutes.jsx — Centralized route definitions with Lucide icons & Appointments Calendar
+// routes/AppRoutes.jsx — Centralized route definitions with Lucide icons & Clinical Workspaces
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
@@ -22,6 +22,16 @@ import PatientDashboard from "../features/patient/PatientDashboard";
 
 // Appointments
 import AppointmentsPage from "../features/appointments/AppointmentsPage";
+
+// Clinical Visit Encounter (Sprint 14)
+import ClinicalEncounterPage from "../features/visits/ClinicalEncounterPage";
+
+// Pharmacy & Inventory (Sprint 15)
+import PharmacyQueuePage from "../features/pharmacy/PharmacyQueuePage";
+import MedicineInventoryPage from "../features/pharmacy/MedicineInventoryPage";
+
+// Patient 360° Medical Timeline (Sprint 16)
+import PatientTimelinePage from "../features/timeline/PatientTimelinePage";
 
 // Unauthorized page
 const Unauthorized = () => (
@@ -66,19 +76,30 @@ const AppRoutes = () => {
         <Route path="/admin/doctors"      element={<ManageDoctors />} />
         <Route path="/admin/patients"     element={<ManagePatients />} />
         <Route path="/admin/appointments" element={<AppointmentsPage />} />
+        <Route path="/admin/pharmacy"     element={<PharmacyQueuePage />} />
+        <Route path="/admin/medicines"    element={<MedicineInventoryPage />} />
       </Route>
 
-      {/* Doctor Routes (admin can also view) */}
+      {/* Doctor & Staff Routes (admin + doctor) */}
       <Route element={<ProtectedRoute allowedRoles={["admin", "doctor"]} />}>
-        <Route path="/doctor/dashboard"    element={<DoctorDashboard />} />
-        <Route path="/doctor/appointments" element={<AppointmentsPage />} />
-        <Route path="/doctor/:doctorId"    element={<DoctorDetail />} />
+        <Route path="/doctor/dashboard"      element={<DoctorDashboard />} />
+        <Route path="/doctor/appointments"   element={<AppointmentsPage />} />
+        <Route path="/doctor/:doctorId"      element={<DoctorDetail />} />
+        <Route path="/doctor/visits/:visitId" element={<ClinicalEncounterPage />} />
+        <Route path="/doctor/encounters/new" element={<ClinicalEncounterPage />} />
+        <Route path="/patients/:patientId/360" element={<PatientTimelinePage />} />
       </Route>
 
       {/* Patient Routes */}
       <Route element={<ProtectedRoute allowedRoles={["patient"]} />}>
         <Route path="/patient/dashboard"    element={<PatientDashboard />} />
         <Route path="/patient/appointments" element={<AppointmentsPage />} />
+        <Route path="/patient/history"      element={<PatientTimelinePage />} />
+      </Route>
+
+      {/* Universal Protected Routes for all authenticated roles */}
+      <Route element={<ProtectedRoute allowedRoles={["admin", "doctor", "patient"]} />}>
+        <Route path="/visits/:visitId" element={<ClinicalEncounterPage />} />
       </Route>
 
       {/* Misc */}

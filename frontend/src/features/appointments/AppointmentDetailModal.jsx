@@ -210,6 +210,21 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onRefresh }) => 
                 </button>
               )}
 
+              {/* Clinical Encounter Launch Button */}
+              {isStaff && ["confirmed", "checked_in", "in_consultation"].includes(status) && (
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  style={{ background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)" }}
+                  onClick={() => {
+                    onClose();
+                    window.location.href = `/doctor/encounters/new?appointmentId=${appointment.appointmentId}`;
+                  }}
+                >
+                  <Stethoscope size={14} /> Open Clinical Encounter
+                </button>
+              )}
+
               {/* Cancellation trigger allowed for all roles on active appointments */}
               <button type="button" className="btn btn-outline btn-sm" style={{ color: "#ef4444", borderColor: "rgba(239, 68, 68, 0.4)" }} onClick={() => setShowCancelInput(true)} disabled={submitting}>
                 <XCircle size={14} /> Cancel Appointment

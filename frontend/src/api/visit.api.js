@@ -10,5 +10,8 @@ export const getVisitByIdApi = (visitId) =>
 export const createVisitApi = (data) =>
   api.post("/visits", data).then((r) => r.data);
 
+export const updateVisitApi = (visitId, data) =>
+  api.patch(`/visits/${visitId}`, data).then((r) => r.data);
+
 export const completeVisitApi = (visitId, data) =>
   api.patch(`/visits/${visitId}/complete`, data).then((r) => r.data);
