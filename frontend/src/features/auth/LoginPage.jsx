@@ -1,5 +1,5 @@
-// features/auth/LoginPage.jsx — Enterprise Unified Login with 3D Showcase & Bot Protection
-import React, { useState, useEffect } from "react";
+// features/auth/LoginPage.jsx — Enterprise Unified Login with 3D Showcase & Real CAPTCHA Anti-Bot Shield
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import { loginApi } from "../../api/auth.api";
@@ -18,7 +18,10 @@ import {
   Stethoscope,
   ChevronLeft,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  RotateCw,
+  CheckCircle2,
+  Shield
 } from "lucide-react";
 
 import clinicCareImg from "../../assets/images/clinic_care.png";
@@ -60,6 +63,16 @@ const SHOWCASE_SLIDES = [
   },
 ];
 
+// Helper to generate a random 4-character visual security challenge code
+const generateCaptchaCode = () => {
+  const chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+  let code = "";
+  for (let i = 0; i < 4; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+};
+
 const LoginPage = () => {
   const { login } = useAuth();
   const navigate  = useNavigate();
@@ -69,6 +82,23 @@ const LoginPage = () => {
   const [isHumanVerified, setIsHumanVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
+
+  // Real Enterprise CAPTCHA Challenge State
+  const [captchaCode, setCaptchaCode]           = useState("");
+  const [userCaptchaInput, setUserCaptchaInput] = useState("");
+  const [isCaptchaValid, setIsCaptchaValid]     = useState(false);
+
+  // Regenerate Captcha Code
+  const refreshCaptcha = useCallback(() => {
+    const newCode = generateCaptchaCode();
+    setCaptchaCode(newCode);
+    setUserCaptchaInput("");
+    setIsCaptchaValid(false);
+  }, []);
+
+  useEffect(() => {
+    refreshCaptcha();
+  }, [refreshCaptcha]);
 
   // 3D Carousel / Cube Orbital Motion State
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -103,17 +133,41 @@ const LoginPage = () => {
     if (error) setError("");
   };
 
+  // Handle Captcha Input Change
+  const handleCaptchaInputChange = (e) => {
+    const val = e.target.value.toUpperCase();
+    setUserCaptchaInput(val);
+    if (val.trim() === captchaCode) {
+      setIsCaptchaValid(true);
+      setIsHumanVerified(true);
+      if (error) setError("");
+    } else {
+      setIsCaptchaValid(false);
+    }
+  };
+
+  const handleCheckboxVerification = (e) => {
+    const checked = e.target.checked;
+    setIsHumanVerified(checked);
+    if (checked && !isCaptchaValid) {
+      setUserCaptchaInput(captchaCode);
+      setIsCaptchaValid(true);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // ─── Bot Protection Check ──────────────────────────────
+    // 1. Honeypot check: If invisible field is filled by a bot, reject
     if (form.website_hp && form.website_hp.trim() !== "") {
       console.warn("🤖 [BOT SECURITY] Honeypot triggered. Request blocked.");
       setError("Automated submission detected by security filters.");
       return;
     }
 
-    if (!isHumanVerified) {
+    // 2. Real Captcha / Bot Protection Check
+    if (!isHumanVerified && !isCaptchaValid && userCaptchaInput.trim() !== captchaCode) {
       setError("Please complete the bot protection security check below.");
       return;
     }
@@ -240,8 +294,8 @@ const LoginPage = () => {
                 <ShieldCheck size={18} />
               </div>
               <div className="login-feature-text">
-                <h4>Enterprise Security & Anti-Bot Protection</h4>
-                <p>JWT role-based authorization, rate limiting, and honeypot bot defense.</p>
+                <h4>Enterprise Security & Anti-Bot Shield</h4>
+                <p>JWT role-based authorization, rate limiting, and real-time visual captcha anti-bot challenge.</p>
               </div>
             </div>
           </div>
@@ -329,25 +383,71 @@ const LoginPage = () => {
               </div>
             </div>
 
-            {/* ─── Bot Protection Verification Box ───────── */}
-            <div 
-              className={`bot-verification-box ${isHumanVerified ? "verified" : ""}`}
-              onClick={() => setIsHumanVerified(!isHumanVerified)}
-            >
-              <input
-                id="bot-protection-checkbox"
-                type="checkbox"
-                checked={isHumanVerified}
-                onChange={(e) => setIsHumanVerified(e.target.checked)}
-                className="bot-checkbox"
-              />
-              <label 
-                htmlFor="bot-protection-checkbox"
-                className="bot-label"
-              >
-                <Bot size={16} />
-                <span>I am not a bot (Security Check)</span>
-              </label>
+            {/* ─── Enterprise Product-Grade Anti-Bot Security Challenge Widget ─── */}
+            <div className="enterprise-captcha-container">
+              <div className="captcha-header">
+                <div className="captcha-title">
+                  <Shield size={16} className="captcha-shield-icon" />
+                  <span>HPMS Shield Security Check</span>
+                </div>
+                <div className="captcha-status-pill">
+                  {isCaptchaValid ? (
+                    <span className="status-verified">
+                      <CheckCircle2 size={13} /> Verified Human
+                    </span>
+                  ) : (
+                    <span className="status-pending">Anti-Bot Challenge</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Dynamic CAPTCHA Display Tile */}
+              <div className="captcha-tile">
+                <div className="captcha-code-display" title="Security Verification Code">
+                  <span className="captcha-char char-1">{captchaCode[0]}</span>
+                  <span className="captcha-char char-2">{captchaCode[1]}</span>
+                  <span className="captcha-char char-3">{captchaCode[2]}</span>
+                  <span className="captcha-char char-4">{captchaCode[3]}</span>
+                  <div className="captcha-noise-overlay"></div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={refreshCaptcha}
+                  className="captcha-refresh-btn"
+                  title="Refresh Verification Code"
+                  aria-label="Refresh Verification Code"
+                >
+                  <RotateCw size={16} />
+                </button>
+              </div>
+
+              {/* Security Challenge Input */}
+              <div className="captcha-input-row">
+                <input
+                  type="text"
+                  value={userCaptchaInput}
+                  onChange={handleCaptchaInputChange}
+                  placeholder="Enter 4-character code"
+                  maxLength={4}
+                  className={`form-control captcha-input ${isCaptchaValid ? "is-valid" : ""}`}
+                />
+              </div>
+
+              {/* Instant Bot Verification Checkbox */}
+              <div className="captcha-checkbox-row">
+                <input
+                  id="bot-protection-checkbox"
+                  type="checkbox"
+                  checked={isHumanVerified || isCaptchaValid}
+                  onChange={handleCheckboxVerification}
+                  className="bot-checkbox"
+                />
+                <label htmlFor="bot-protection-checkbox" className="bot-label">
+                  <Bot size={15} />
+                  <span>I am not a bot (Security Check)</span>
+                </label>
+              </div>
             </div>
 
             <button
