@@ -7,6 +7,18 @@ Its primary purpose is to manage Hospital entities, specifically **Doctors** and
 
 ---
 
+## 🔑 Demo & Reviewer Test Credentials
+
+For quick evaluation, use the following pre-configured credentials:
+
+| Role | Email | Password | Access Capabilities |
+| :--- | :--- | :--- | :--- |
+| **👑 Admin** | `admin@hpms.com` | `admin123` | Full system access, Manage Doctors/Patients, Pharmacy Queue & Stock Inventory |
+| **🩺 Doctor** | `doctor@hpms.com` | `doctor123` | Doctor Dashboard, Clinical Encounter Workspace, Vitals/Diagnosis & Prescriptions |
+| **🧑 Patient** | `patient@hpms.com` | `patient123` | Patient Dashboard, Appointment History, 360° Medical Timeline |
+
+---
+
 ## 🏗️ Architecture & Tech Stack
 
 ### 1. Backend (Node.js + Express + MongoDB)

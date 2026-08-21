@@ -18,7 +18,7 @@ describe("QA Database Verification: loginUser Integration Test", () => {
   });
 
   test("should successfully log in admin user created by seed.js", async () => {
-    const result = await loginUser("admin@hpms.com", "Admin@123");
+    const result = await loginUser("admin@hpms.com", "admin123");
     expect(result).toHaveProperty("token");
     expect(result.user).toEqual(
       expect.objectContaining({

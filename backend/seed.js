@@ -1,10 +1,9 @@
-// seed.js — Demo data seeder for interview presentations
+// seed.js — Demo data seeder for interview presentations & reviewer testing
 // Run: npm run seed
-// Creates: 1 Admin + 2 Doctors + 2 Patients with linked User accounts
+// Creates: Easy-to-remember Demo Users (Admin, Doctor, Patient) + Models
 
 import "dotenv/config";
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
 import User from "./src/models/user.model.js";
 import Doctor from "./src/modules/doctor/doctor.model.js";
 import Patient from "./src/modules/patient/patient.model.js";
@@ -22,73 +21,53 @@ const seed = async () => {
 
     // ─── 1. Create Admin User ─────────────────────────────────────────────────
     const adminUser = await User.create({
-      name: "Admin Singh",
+      name: "Admin User",
       email: "admin@hpms.com",
-      password: "Admin@123",
+      password: "admin123",
       role: "admin",
     });
-    console.log("✅ Admin created: admin@hpms.com / Admin@123");
 
-    // ─── 2. Create Doctors ────────────────────────────────────────────────────
-    const doctorUser1 = await User.create({
+    // ─── 2. Create Doctor User & Profile ──────────────────────────────────────
+    const doctorUser = await User.create({
       name: "Dr. Arjun Sharma",
-      email: "arjun.sharma@hpms.com",
-      password: "Doctor@123",
+      email: "doctor@hpms.com",
+      password: "doctor123",
       role: "doctor",
     });
 
-    const doctorUser2 = await User.create({
-      name: "Dr. Priya Mehta",
-      email: "priya.mehta@hpms.com",
-      password: "Doctor@123",
-      role: "doctor",
-    });
-
-    const doctor1 = await Doctor.create({
+    const doctorProfile = await Doctor.create({
       doctorId: 1,
       name: "Dr. Arjun Sharma",
       specialization: "Cardiologist",
       experience: 15,
       phone: "+91-9876543210",
+      email: "doctor@hpms.com",
+      userId: doctorUser._id,
+    });
+
+    await User.findByIdAndUpdate(doctorUser._id, { linkedId: doctorProfile._id, linkedModel: "Doctor" });
+
+    // Also keep legacy alias arjun.sharma@hpms.com for backward compatible tests
+    const legacyDoctorUser = await User.create({
+      name: "Dr. Arjun Sharma",
       email: "arjun.sharma@hpms.com",
-      userId: doctorUser1._id,
+      password: "Doctor@123",
+      role: "doctor",
     });
+    await User.findByIdAndUpdate(legacyDoctorUser._id, { linkedId: doctorProfile._id, linkedModel: "Doctor" });
 
-    const doctor2 = await Doctor.create({
-      doctorId: 2,
-      name: "Dr. Priya Mehta",
-      specialization: "Neurologist",
-      experience: 10,
-      phone: "+91-9876543211",
-      email: "priya.mehta@hpms.com",
-      userId: doctorUser2._id,
-    });
-
-    // Link doctor userId back
-    await User.findByIdAndUpdate(doctorUser1._id, { linkedId: doctor1._id, linkedModel: "Doctor" });
-    await User.findByIdAndUpdate(doctorUser2._id, { linkedId: doctor2._id, linkedModel: "Doctor" });
-
-    console.log("✅ Doctors created: arjun.sharma@hpms.com / priya.mehta@hpms.com — Password: Doctor@123");
-
-    // ─── 3. Create Patients ───────────────────────────────────────────────────
-    const patientUser1 = await User.create({
+    // ─── 3. Create Patient User & Profile ─────────────────────────────────────
+    const patientUser = await User.create({
       name: "Ravi Kumar",
-      email: "ravi.kumar@hpms.com",
-      password: "Patient@123",
+      email: "patient@hpms.com",
+      password: "patient123",
       role: "patient",
     });
 
-    const patientUser2 = await User.create({
-      name: "Anita Patel",
-      email: "anita.patel@hpms.com",
-      password: "Patient@123",
-      role: "patient",
-    });
-
-    const patient1 = await Patient.create({
+    const patientProfile = await Patient.create({
       patientId: 1,
-      doctorId: doctor1._id,
-      userId: patientUser1._id,
+      doctorId: doctorProfile._id,
+      userId: patientUser._id,
       name: "Ravi Kumar",
       age: 45,
       gender: "Male",
@@ -101,37 +80,36 @@ const seed = async () => {
       releasingSummary: "",
     });
 
-    const patient2 = await Patient.create({
-      patientId: 2,
-      doctorId: doctor2._id,
-      userId: patientUser2._id,
-      name: "Anita Patel",
-      age: 38,
-      gender: "Female",
-      contact: "+91-9823456789",
-      disease: "Migraine",
-      symptoms: "Severe headaches, nausea, light sensitivity",
-      medicinePrescribed: "Sumatriptan 50mg, Propranolol 40mg",
-      admissionStatus: "Outdoor",
-      admittedDate: null,
-      releasingSummary: "Managed outpatient. Follow-up in 2 weeks.",
+    await User.findByIdAndUpdate(patientUser._id, { linkedId: patientProfile._id, linkedModel: "Patient" });
+
+    // Also create secondary doctor & patient for rich UI lists
+    const doctor2User = await User.create({
+      name: "Dr. Priya Mehta",
+      email: "priya.mehta@hpms.com",
+      password: "doctor123",
+      role: "doctor",
     });
 
-    await User.findByIdAndUpdate(patientUser1._id, { linkedId: patient1._id, linkedModel: "Patient" });
-    await User.findByIdAndUpdate(patientUser2._id, { linkedId: patient2._id, linkedModel: "Patient" });
+    const doctor2Profile = await Doctor.create({
+      doctorId: 2,
+      name: "Dr. Priya Mehta",
+      specialization: "Neurologist",
+      experience: 10,
+      phone: "+91-9876543211",
+      email: "priya.mehta@hpms.com",
+      userId: doctor2User._id,
+    });
 
-    console.log("✅ Patients created: ravi.kumar@hpms.com / anita.patel@hpms.com — Password: Patient@123");
+    await User.findByIdAndUpdate(doctor2User._id, { linkedId: doctor2Profile._id, linkedModel: "Doctor" });
 
     // ─── Summary ──────────────────────────────────────────────────────────────
-    console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-    console.log("🏥 HPMS Seed Complete! Demo Credentials:");
-    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-    console.log("👑 Admin   → admin@hpms.com       / Admin@123");
-    console.log("🩺 Doctor  → arjun.sharma@hpms.com / Doctor@123");
-    console.log("🩺 Doctor  → priya.mehta@hpms.com  / Doctor@123");
-    console.log("🧑 Patient → ravi.kumar@hpms.com   / Patient@123");
-    console.log("🧑 Patient → anita.patel@hpms.com  / Patient@123");
-    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+    console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    console.log("🏥 HPMS Seed Complete! Easy-to-Remember Demo Credentials:");
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    console.log("👑 Admin   → Email: admin@hpms.com   | Password: admin123");
+    console.log("🩺 Doctor  → Email: doctor@hpms.com  | Password: doctor123");
+    console.log("🧑 Patient → Email: patient@hpms.com | Password: patient123");
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
 
     await mongoose.disconnect();
     process.exit(0);
