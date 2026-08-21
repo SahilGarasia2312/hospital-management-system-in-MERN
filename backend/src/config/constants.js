@@ -45,3 +45,21 @@ export const VISIT_STATUS = {
   OPEN: "open",
   COMPLETED: "completed",
 };
+
+export const PRESCRIPTION_STATUS = {
+  ISSUED: "issued",
+  PARTIALLY_DISPENSED: "partially_dispensed",
+  DISPENSED: "dispensed",
+  CANCELLED: "cancelled",
+};
+
+export const DOSAGE_FORMS = [
+  "Tablet",
+  "Capsule",
+  "Syrup",
+  "Injection",
+  "Ointment",
+  "Drops",
+  "Inhaler",
+  "Other",
+];
