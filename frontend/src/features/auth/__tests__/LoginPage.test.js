@@ -39,9 +39,26 @@ describe("QA UI Test: LoginPage Component", () => {
 
     expect(screen.getByText(/sign in to portal/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
     expect(screen.getByText(/i am not a bot/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument();
+  });
+
+  test("toggles password visibility when eye icon button is clicked", () => {
+    render(
+      <MemoryRouter>
+        <LoginPage />
+      </MemoryRouter>
+    );
+
+    const passwordInput = screen.getByLabelText(/^password$/i);
+    const toggleEyeBtn = screen.getByRole("button", { name: /show password/i });
+
+    expect(passwordInput.type).toBe("password");
+    fireEvent.click(toggleEyeBtn);
+    expect(passwordInput.type).toBe("text");
+    fireEvent.click(toggleEyeBtn);
+    expect(passwordInput.type).toBe("password");
   });
 
   test("requires bot protection check before submitting", async () => {
@@ -52,7 +69,7 @@ describe("QA UI Test: LoginPage Component", () => {
     );
 
     const emailInput = screen.getByLabelText(/email address/i);
-    const passwordInput = screen.getByLabelText(/password/i);
+    const passwordInput = screen.getByLabelText(/^password$/i);
     const submitBtn = screen.getByRole("button", { name: /sign in/i });
 
     fireEvent.change(emailInput, { target: { value: "admin@hpms.com" } });
@@ -78,7 +95,7 @@ describe("QA UI Test: LoginPage Component", () => {
     );
 
     const emailInput = screen.getByLabelText(/email address/i);
-    const passwordInput = screen.getByLabelText(/password/i);
+    const passwordInput = screen.getByLabelText(/^password$/i);
     const botCheckbox = screen.getByLabelText(/i am not a bot/i);
     const submitBtn = screen.getByRole("button", { name: /sign in/i });
 
@@ -116,7 +133,7 @@ describe("QA UI Test: LoginPage Component", () => {
     );
 
     const emailInput = screen.getByLabelText(/email address/i);
-    const passwordInput = screen.getByLabelText(/password/i);
+    const passwordInput = screen.getByLabelText(/^password$/i);
     const botCheckbox = screen.getByLabelText(/i am not a bot/i);
     const submitBtn = screen.getByRole("button", { name: /sign in/i });
 

@@ -1,4 +1,4 @@
-// features/auth/LoginPage.jsx — Enterprise Unified Login with Bot Protection Security
+// features/auth/LoginPage.jsx — Enterprise Unified Login with Bot Protection & Password Visibility Toggle
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
@@ -12,7 +12,9 @@ import {
   AlertCircle, 
   ArrowRight, 
   UserCheck,
-  Bot
+  Bot,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import "./LoginPage.css";
 
@@ -27,6 +29,7 @@ const LoginPage = () => {
   const navigate  = useNavigate();
 
   const [form, setForm]       = useState({ email: "", password: "", website_hp: "" });
+  const [showPassword, setShowPassword]       = useState(false);
   const [isHumanVerified, setIsHumanVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
@@ -176,21 +179,43 @@ const LoginPage = () => {
               <label className="form-label" htmlFor="login-password">
                 Password
               </label>
-              <div className="form-input-wrapper">
+              <div className="form-input-wrapper" style={{ position: "relative" }}>
                 <span className="form-input-icon">
                   <Lock size={18} />
                 </span>
                 <input
                   id="login-password"
                   className="form-control with-icon"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={form.password}
                   onChange={handleChange}
                   placeholder="••••••••"
                   required
                   autoComplete="current-password"
+                  style={{ paddingRight: "40px" }}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  style={{
+                    position: "absolute",
+                    right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "#64748b",
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "4px"
+                  }}
+                  title={showPassword ? "Hide Password" : "Show Password"}
+                  aria-label={showPassword ? "Hide Password" : "Show Password"}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
 
