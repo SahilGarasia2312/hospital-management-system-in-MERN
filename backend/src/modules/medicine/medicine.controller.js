@@ -8,7 +8,7 @@ import { sendSuccess } from "../../utils/response.utils.js";
  */
 export const createMedicine = async (req, res, next) => {
   try {
-    const medicine = await medicineService.createMedicine(req.body);
+    const medicine = await medicineService.createMedicine(req.body, req.user);
     return sendSuccess(res, medicine, "Medicine added to catalog successfully", 201);
   } catch (err) {
     next(err);
@@ -49,7 +49,7 @@ export const getMedicineById = async (req, res, next) => {
 export const updateMedicine = async (req, res, next) => {
   try {
     const { medicineId } = req.params;
-    const updated = await medicineService.updateMedicine(medicineId, req.body);
+    const updated = await medicineService.updateMedicine(medicineId, req.body, req.user);
     return sendSuccess(res, updated, "Medicine details updated successfully");
   } catch (err) {
     next(err);
@@ -64,7 +64,7 @@ export const updateMedicineStock = async (req, res, next) => {
   try {
     const { medicineId } = req.params;
     const { stockQuantity } = req.body;
-    const updated = await medicineService.updateMedicineStock(medicineId, stockQuantity);
+    const updated = await medicineService.updateMedicineStock(medicineId, stockQuantity, req.user);
     return sendSuccess(res, updated, "Medicine stock updated successfully");
   } catch (err) {
     next(err);

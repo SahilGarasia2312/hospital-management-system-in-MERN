@@ -2,8 +2,9 @@
 import Appointment from "./appointment.model.js";
 import Doctor from "../doctor/doctor.model.js";
 import Patient from "../patient/patient.model.js";
-import { APPOINTMENT_STATUS, ROLES } from "../../config/constants.js";
+import { APPOINTMENT_STATUS, ROLES, AUDIT_ACTIONS } from "../../config/constants.js";
 import { NotFoundError, ConflictError, ForbiddenError, BadRequestError } from "../../core/errors/index.js";
+import { createAuditLog } from "../audit/audit.service.js";
 
 /** Valid state transitions graph */
 const ALLOWED_TRANSITIONS = {
@@ -99,7 +100,7 @@ export const createAppointment = async (data, requestingUser) => {
 
   const appointmentId = await generateAppointmentId();
 
-  return Appointment.create({
+  const created = await Appointment.create({
     appointmentId,
     patientId: patient._id,
     doctorId: doctor._id,
@@ -110,6 +111,20 @@ export const createAppointment = async (data, requestingUser) => {
     status: APPOINTMENT_STATUS.SCHEDULED,
     createdBy: requestingUser.id,
   });
+
+  await createAuditLog({
+    actor: { userId: requestingUser.id, role: requestingUser.role },
+    action: AUDIT_ACTIONS.APPOINTMENT_CREATED,
+    resource: { type: "appointment", id: created.appointmentId },
+    metadata: {
+      patientId: patient.patientId,
+      doctorId: doctor.doctorId,
+      appointmentDate: parsedDate,
+      reason,
+    },
+  });
+
+  return created;
 };
 
 /**
@@ -262,6 +277,13 @@ export const updateAppointmentStatus = async (appointmentId, newStatus, requesti
   appointment.status = newStatus;
   await appointment.save();
 
+  await createAuditLog({
+    actor: { userId: requestingUser.id, role: requestingUser.role },
+    action: AUDIT_ACTIONS.APPOINTMENT_STATUS_CHANGED,
+    resource: { type: "appointment", id: appointment.appointmentId },
+    metadata: { previousStatus: currentStatus, newStatus },
+  });
+
   return appointment.populate([
     { path: "doctorId", select: "doctorId name specialization" },
     { path: "patientId", select: "patientId name" },
@@ -301,6 +323,13 @@ export const cancelAppointment = async (appointmentId, cancellationReason, reque
   appointment.status = APPOINTMENT_STATUS.CANCELLED;
   appointment.cancellationReason = cancellationReason;
   await appointment.save();
+
+  await createAuditLog({
+    actor: { userId: requestingUser.id, role: requestingUser.role },
+    action: AUDIT_ACTIONS.APPOINTMENT_CANCELLED,
+    resource: { type: "appointment", id: appointment.appointmentId },
+    metadata: { cancellationReason },
+  });
 
   return appointment.populate([
     { path: "doctorId", select: "doctorId name specialization" },

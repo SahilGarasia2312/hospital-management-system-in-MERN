@@ -1,6 +1,8 @@
 // modules/medicine/medicine.service.js — Pure business logic for medicine catalog management
 import Medicine from "./medicine.model.js";
 import { NotFoundError, ConflictError, BadRequestError } from "../../core/errors/index.js";
+import { createAuditLog } from "../audit/audit.service.js";
+import { AUDIT_ACTIONS } from "../../config/constants.js";
 
 /**
  * Generates sequential numeric medicineId safely.
@@ -15,7 +17,7 @@ const generateMedicineId = async () => {
 /**
  * Create a new medicine entry in master catalog
  */
-export const createMedicine = async (data) => {
+export const createMedicine = async (data, requestingUser = null) => {
   const { name, genericName, dosageForm, strength, manufacturer, unitPrice, stockQuantity, reorderLevel } = data;
 
   const escapedName = name.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -31,7 +33,7 @@ export const createMedicine = async (data) => {
 
   const medicineId = await generateMedicineId();
 
-  return Medicine.create({
+  const created = await Medicine.create({
     medicineId,
     name,
     genericName: genericName || "",
@@ -42,6 +44,15 @@ export const createMedicine = async (data) => {
     stockQuantity: stockQuantity || 0,
     reorderLevel: reorderLevel !== undefined ? reorderLevel : 10,
   });
+
+  await createAuditLog({
+    actor: requestingUser ? { userId: requestingUser.id, role: requestingUser.role } : { role: "admin" },
+    action: AUDIT_ACTIONS.MEDICINE_CREATED,
+    resource: { type: "medicine", id: created.medicineId },
+    metadata: { name: created.name, strength: created.strength, dosageForm: created.dosageForm, stockQuantity: created.stockQuantity },
+  });
+
+  return created;
 };
 
 /**
@@ -102,7 +113,7 @@ export const getMedicineById = async (medicineId) => {
 /**
  * Update medicine entry details
  */
-export const updateMedicine = async (medicineId, data) => {
+export const updateMedicine = async (medicineId, data, requestingUser = null) => {
   const medicine = await Medicine.findOne({ medicineId: Number(medicineId) });
   if (!medicine) {
     throw new NotFoundError("Medicine not found in catalog.");
@@ -117,13 +128,21 @@ export const updateMedicine = async (medicineId, data) => {
   });
 
   await medicine.save();
+
+  await createAuditLog({
+    actor: requestingUser ? { userId: requestingUser.id, role: requestingUser.role } : { role: "admin" },
+    action: AUDIT_ACTIONS.MEDICINE_UPDATED,
+    resource: { type: "medicine", id: medicine.medicineId },
+    metadata: { updatedFields: Object.keys(data).filter((k) => allowedFields.includes(k)) },
+  });
+
   return medicine;
 };
 
 /**
  * Adjust stock quantity for a medicine
  */
-export const updateMedicineStock = async (medicineId, stockQuantity) => {
+export const updateMedicineStock = async (medicineId, stockQuantity, requestingUser = null) => {
   const medicine = await Medicine.findOne({ medicineId: Number(medicineId) });
   if (!medicine) {
     throw new NotFoundError("Medicine not found in catalog.");
@@ -133,7 +152,20 @@ export const updateMedicineStock = async (medicineId, stockQuantity) => {
     throw new BadRequestError("Stock quantity cannot be negative.");
   }
 
+  const previousQuantity = medicine.stockQuantity;
   medicine.stockQuantity = stockQuantity;
   await medicine.save();
+
+  await createAuditLog({
+    actor: requestingUser ? { userId: requestingUser.id, role: requestingUser.role } : { role: "admin" },
+    action: AUDIT_ACTIONS.MEDICINE_STOCK_UPDATED,
+    resource: { type: "medicine", id: medicine.medicineId },
+    metadata: {
+      previousQuantity,
+      newQuantity: stockQuantity,
+      change: stockQuantity - previousQuantity,
+    },
+  });
+
   return medicine;
 };

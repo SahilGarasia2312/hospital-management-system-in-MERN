@@ -3,8 +3,9 @@ import ClinicalVisit from "./visit.model.js";
 import Doctor from "../doctor/doctor.model.js";
 import Patient from "../patient/patient.model.js";
 import Appointment from "../appointment/appointment.model.js";
-import { VISIT_STATUS, APPOINTMENT_STATUS, ROLES } from "../../config/constants.js";
+import { VISIT_STATUS, APPOINTMENT_STATUS, ROLES, AUDIT_ACTIONS } from "../../config/constants.js";
 import { NotFoundError, ConflictError, ForbiddenError, BadRequestError } from "../../core/errors/index.js";
+import { createAuditLog } from "../audit/audit.service.js";
 
 /**
  * Generates sequential numeric visitId safely.
@@ -102,7 +103,7 @@ export const createVisit = async (data, requestingUser) => {
 
   const visitId = await generateVisitId();
 
-  return ClinicalVisit.create({
+  const created = await ClinicalVisit.create({
     visitId,
     patientId: patient._id,
     doctorId: doctor._id,
@@ -115,6 +116,19 @@ export const createVisit = async (data, requestingUser) => {
     followUpDate: followUpDate ? new Date(followUpDate) : null,
     status: VISIT_STATUS.OPEN,
   });
+
+  await createAuditLog({
+    actor: { userId: requestingUser.id, role: requestingUser.role },
+    action: AUDIT_ACTIONS.VISIT_CREATED,
+    resource: { type: "visit", id: created.visitId },
+    metadata: {
+      patientId: patient.patientId,
+      doctorId: doctor.doctorId,
+      hasAppointment: !!linkedAppointment,
+    },
+  });
+
+  return created;
 };
 
 /**
@@ -311,6 +325,16 @@ export const completeVisit = async (visitId, data = {}, requestingUser) => {
       await appointment.save();
     }
   }
+
+  await createAuditLog({
+    actor: { userId: requestingUser.id, role: requestingUser.role },
+    action: AUDIT_ACTIONS.VISIT_COMPLETED,
+    resource: { type: "visit", id: visit.visitId },
+    metadata: {
+      diagnosis: visit.diagnosis,
+      completedAt: visit.completedAt,
+    },
+  });
 
   return visit.populate([
     { path: "doctorId", select: "doctorId name specialization" },

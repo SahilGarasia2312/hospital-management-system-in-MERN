@@ -3,6 +3,8 @@
 import User from "../../models/user.model.js";
 import { signToken } from "../../utils/jwt.utils.js";
 import { ConflictError, UnauthorizedError, NotFoundError } from "../../core/errors/index.js";
+import { createAuditLog } from "../audit/audit.service.js";
+import { AUDIT_ACTIONS } from "../../config/constants.js";
 
 /**
  * Registers a new user (admin-only action).
@@ -65,6 +67,13 @@ export const loginUser = async (email, password) => {
 
   console.log(`[AUTH DEBUG] Login successful for user: ${user.email} (Role: ${user.role})`);
   const token = signToken({ id: user._id, role: user.role, name: user.name, email: user.email });
+
+  await createAuditLog({
+    actor: { userId: user._id, role: user.role },
+    action: AUDIT_ACTIONS.LOGIN_SUCCESS,
+    resource: { type: "user", id: user._id },
+    metadata: { email: user.email, name: user.name },
+  });
 
   return {
     token,

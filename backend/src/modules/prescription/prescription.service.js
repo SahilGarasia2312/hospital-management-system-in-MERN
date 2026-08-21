@@ -4,8 +4,9 @@ import Medicine from "../medicine/medicine.model.js";
 import Doctor from "../doctor/doctor.model.js";
 import Patient from "../patient/patient.model.js";
 import ClinicalVisit from "../visit/visit.model.js";
-import { PRESCRIPTION_STATUS, ROLES } from "../../config/constants.js";
+import { PRESCRIPTION_STATUS, ROLES, AUDIT_ACTIONS } from "../../config/constants.js";
 import { NotFoundError, ConflictError, ForbiddenError, BadRequestError } from "../../core/errors/index.js";
+import { createAuditLog } from "../audit/audit.service.js";
 
 /**
  * Generates sequential numeric prescriptionId safely.
@@ -93,7 +94,7 @@ export const createPrescription = async (data, requestingUser) => {
 
   const prescriptionId = await generatePrescriptionId();
 
-  return Prescription.create({
+  const created = await Prescription.create({
     prescriptionId,
     patientId: patient._id,
     doctorId: doctor._id,
@@ -103,6 +104,19 @@ export const createPrescription = async (data, requestingUser) => {
     notes: notes || "",
     createdBy: requestingUser.id,
   });
+
+  await createAuditLog({
+    actor: { userId: requestingUser.id, role: requestingUser.role },
+    action: AUDIT_ACTIONS.PRESCRIPTION_ISSUED,
+    resource: { type: "prescription", id: created.prescriptionId },
+    metadata: {
+      patientId: patient.patientId,
+      doctorId: doctor.doctorId,
+      itemCount: created.items.length,
+    },
+  });
+
+  return created;
 };
 
 /**
@@ -268,6 +282,19 @@ export const dispensePrescription = async (prescriptionId, dispensePayload = {},
 
   await prescription.save();
 
+  const totalQuantityDispensed = prescription.items.reduce((sum, item) => sum + item.quantityDispensed, 0);
+
+  await createAuditLog({
+    actor: { userId: requestingUser.id, role: requestingUser.role },
+    action: AUDIT_ACTIONS.PRESCRIPTION_DISPENSED,
+    resource: { type: "prescription", id: prescription.prescriptionId },
+    metadata: {
+      status: prescription.status,
+      itemCount: prescription.items.length,
+      totalQuantityDispensed,
+    },
+  });
+
   return prescription.populate([
     { path: "doctorId", select: "doctorId name specialization" },
     { path: "patientId", select: "patientId name" },
@@ -303,6 +330,13 @@ export const cancelPrescription = async (prescriptionId, cancellationReason, req
   prescription.status = PRESCRIPTION_STATUS.CANCELLED;
   prescription.cancellationReason = cancellationReason;
   await prescription.save();
+
+  await createAuditLog({
+    actor: { userId: requestingUser.id, role: requestingUser.role },
+    action: AUDIT_ACTIONS.PRESCRIPTION_CANCELLED,
+    resource: { type: "prescription", id: prescription.prescriptionId },
+    metadata: { cancellationReason },
+  });
 
   return prescription.populate([
     { path: "doctorId", select: "doctorId name specialization" },
